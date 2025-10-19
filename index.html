@@ -79,15 +79,16 @@ body{
   touch-action: pan-x pan-y;
 }
 
-/* 小さな修正：日付入力の横伸びを抑える */
+
 #entryDateInput {
-  width: auto;
-  max-width: 180px;
+  width: clamp(120px, 40vw, 220px);
   min-width: 0;
-  -webkit-appearance: none; /* iOS独自UIを少し抑制 */
+  -webkit-appearance: none;
   appearance: none;
   flex-shrink: 1;
+  box-sizing: border-box;
 }
+
 
 /* card shadow only for active pane */
 .tab-pane .card { box-shadow: none; transition: box-shadow .22s ease, transform .18s ease; }
@@ -177,7 +178,6 @@ body.modal-open {
       <section id="tab-today" class="tab-pane pane-active" role="tabpanel">
         <div class="card">
           <div style="margin-bottom:10px">
-            <label for="entryDateInput" style="display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px">日付</label>
             <input type="date" id="entryDateInput" class="input" />
           </div>
 
