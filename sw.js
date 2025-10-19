@@ -5,7 +5,7 @@ const urlsToCache = [
   "./",
   "./index.html",
   "./manifest.json",
-  "./kuro-ba-icon.jpg"
+  "./kurobaicon.jpg"
 ];
 
 // インストール：必要リソースを事前キャッシュ（失敗してもインストールを阻害しない）
@@ -115,8 +115,8 @@ self.addEventListener("push", event => {
   const title = payload.title || "お知らせ";
   const options = {
     body: payload.body || "",
-    icon: "kuro-ba-icon.jpg",
-    badge: "kuro-ba-icon.jpg",
+    icon: "kurobaicon.jpg",
+    badge: "kurobaicon.jpg",
     data: payload.data || {}
   };
   event.waitUntil(self.registration.showNotification(title, options));

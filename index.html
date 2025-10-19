@@ -432,55 +432,46 @@ function enableSwipe(){
   let startX = null;
   let startY = null;
   let startTranslate = 0;
-  let isHorizontal = null; // null = not decided, true = horizontal, false = vertical
+  let isHorizontal = null;
+  let moved = false; // タップかスワイプか判定
 
-  // touchstart: record start positions
   track.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) return;
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     startTranslate = - activeIndex * container.clientWidth;
     isHorizontal = null;
-    // temporarily disable transition while dragging
+    moved = false;
     track.style.transition = 'none';
   }, { passive: true });
 
-  // touchmove: decide direction first, then act only for horizontal
   track.addEventListener('touchmove', (e) => {
     if (startX === null || startY === null) return;
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
 
-    // if not decided yet, decide when movement passes small threshold
     if (isHorizontal === null) {
-      const threshold = 12; // small hysteresis to avoid jitter
+      const threshold = 12;
       if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
         isHorizontal = Math.abs(dx) > Math.abs(dy);
       } else {
-        // too small to decide -> allow default (no preventDefault)
         return;
       }
     }
 
     if (isHorizontal) {
-      // horizontal gesture: prevent vertical scroll and move track
       e.preventDefault();
       track.style.transform = `translateX(${startTranslate + dx}px)`;
-    } else {
-      // vertical gesture: let browser handle scrolling. clean up transforms if any.
-      // do nothing here; allow native scroll
+      moved = true;
     }
   }, { passive: false });
 
-  // touchend / touchcancel: finalize
   function finishTouch(e) {
     if (startX === null) return;
     const dx = (e.changedTouches && e.changedTouches[0]) ? (e.changedTouches[0].clientX - startX) : 0;
 
-    // restore transition
     track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
 
-    // if it was vertical (or undecided), simply snap back to current tab
     if (!isHorizontal) {
       moveToTab(order[activeIndex]);
     } else {
@@ -490,14 +481,20 @@ function enableSwipe(){
       else moveToTab(order[activeIndex]);
     }
 
-    // reset
+    // タップ判定: 横方向にほとんど動いていなければクリックを発火
+    if(!moved && e.target) {
+      e.target.click();
+    }
+
     startX = startY = null;
     isHorizontal = null;
+    moved = false;
   }
 
   track.addEventListener('touchend', finishTouch, { passive: true });
   track.addEventListener('touchcancel', finishTouch, { passive: true });
 }
+
 
 
 /* ---------- init ---------- */
