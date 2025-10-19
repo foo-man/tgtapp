@@ -432,7 +432,10 @@ function enableSwipe() {
   let startX = 0, startY = 0;
   let currentTranslate = 0;
   let isSwiping = false;
-  let active = false;
+  let moved = false;
+
+  const swipeThreshold = 8; // 横スワイプ判定距離
+  const moveThreshold = container.clientWidth * 0.25; // タブ切替距離
 
   track.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) return;
@@ -440,55 +443,58 @@ function enableSwipe() {
     startY = e.touches[0].clientY;
     currentTranslate = -activeIndex * container.clientWidth;
     isSwiping = false;
-    active = true;
+    moved = false;
     track.style.transition = 'none';
-  }, { passive: true });
+  });
 
   track.addEventListener('touchmove', (e) => {
-    if (!active) return;
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
 
-    // 方向判定: 横スワイプ優先
+    // 横スワイプ判定
     if (!isSwiping) {
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 5) {
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) {
         isSwiping = true;
-      } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 5) {
-        // 縦スクロールならスワイプ無効
-        active = false;
-        return;
+      } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > swipeThreshold) {
+        return; // 縦スクロール
       } else {
-        return;
+        return; // 微小移動
       }
     }
 
     if (isSwiping) {
-      e.preventDefault(); // 横スワイプ優先
+      e.preventDefault(); // 横スワイプ確定時のみ preventDefault
       track.style.transform = `translateX(${currentTranslate + dx}px)`;
+      moved = true;
     }
   }, { passive: false });
 
   track.addEventListener('touchend', (e) => {
-    if (!active) return;
+    const dx = (e.changedTouches[0].clientX - startX) || 0;
+
+    // 横スワイプとして判定する距離に達していなければタップ扱い
+    if (!moved || Math.abs(dx) < swipeThreshold) {
+      // タップイベントはそのまま発火させる
+      const target = e.target;
+      if (target) target.click();
+      track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
+      moveToTab(order[activeIndex]);
+      return;
+    }
+
+    // 十分移動した場合のみスワイプ処理
     track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
-    const dx = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX - startX : 0;
-    const threshold = container.clientWidth * 0.25; // タブ切り替えは25%移動でOK
-
-    if (dx < -threshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
-    else if (dx > threshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
+    if (dx < -moveThreshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
+    else if (dx > moveThreshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
     else moveToTab(order[activeIndex]);
-
-    active = false;
-    isSwiping = false;
   });
 
   track.addEventListener('touchcancel', () => {
     track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
     moveToTab(order[activeIndex]);
-    active = false;
-    isSwiping = false;
   });
 }
+
 
 
 
