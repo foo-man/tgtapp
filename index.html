@@ -450,7 +450,7 @@ function enableSwipe(){
 
     // if not decided yet, decide when movement passes small threshold
     if (isHorizontal === null) {
-      const threshold = 8; // small hysteresis to avoid jitter
+      const threshold = 12; // small hysteresis to avoid jitter
       if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
         isHorizontal = Math.abs(dx) > Math.abs(dy);
       } else {
