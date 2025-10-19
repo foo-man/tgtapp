@@ -161,15 +161,15 @@ body.modal-open {
       </div>
     </div>
     <div style="display:flex;align-items:center;gap:8px">
-      <button id="themeToggle" class="small-btn" aria-label="テーマ切替">🌸</button>
+      <button id="themeToggle" type="button" class="small-btn" aria-label="テーマ切替">🌸</button>
     </div>
   </header>
 
   <!-- tabs -->
   <nav class="tab-nav" role="tablist" aria-label="メインタブ">
-    <button class="tab-btn active" role="tab" aria-selected="true" data-tab="today">🌿 今日</button>
-    <button class="tab-btn" role="tab" data-tab="calendar">📅 カレンダー</button>
-    <button class="tab-btn" role="tab" data-tab="history">📖 履歴</button>
+    <button class="tab-btn active" role="tab" aria-selected="true" data-tab="today" type="button">🌿 今日</button>
+    <button class="tab-btn" role="tab" data-tab="calendar" type="button">📅 カレンダー</button>
+    <button class="tab-btn" role="tab" data-tab="history" type="button">📖 履歴</button>
   </nav>
 
   <!-- panes -->
@@ -193,7 +193,7 @@ body.modal-open {
           <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
             <div style="font-size:0.85rem;color:var(--muted)">保存するとカレンダーにマークが付きます 🌸</div>
             <div style="display:flex;gap:8px">
-              <button id="saveBtn" class="btn-primary">保存</button>
+              <button id="saveBtn" class="btn-primary" type="button">保存</button>
             </div>
           </div>
         </div>
@@ -205,8 +205,8 @@ body.modal-open {
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <div id="calendarTitle" style="font-weight:700;color:var(--muted)"></div>
             <div>
-              <button id="prevMonthBtn" class="small-btn">◀</button>
-              <button id="nextMonthBtn" class="small-btn">▶</button>
+              <button id="prevMonthBtn" class="small-btn" type="button">◀</button>
+              <button id="nextMonthBtn" class="small-btn" type="button">▶</button>
             </div>
           </div>
 
@@ -233,15 +233,15 @@ body.modal-open {
   <div class="modal-backdrop"></div>
   <div class="modal-card" role="dialog" aria-modal="true" tabindex="-1">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-      <button id="prevDayBtn" class="small-btn">◀ 前日</button>
+      <button id="prevDayBtn" class="small-btn" type="button">◀ 前日</button>
       <h3 id="modalDateTitle">📅</h3>
-      <button id="nextDayBtn" class="small-btn">翌日 ▶</button>
+      <button id="nextDayBtn" class="small-btn" type="button">翌日 ▶</button>
     </div>
 
     <div id="historyList" class="history-list" style="min-height:120px;padding:6px"></div>
 
     <div style="text-align:right;margin-top:8px">
-      <button id="closeModalBtn" class="small-btn">閉じる</button>
+      <button id="closeModalBtn" class="small-btn" type="button">閉じる</button>
     </div>
   </div>
 </div>
@@ -336,8 +336,8 @@ function buildHistoryCard(key, data){
   card.appendChild(content);
 
   const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='flex-end'; row.style.gap='8px'; row.style.marginTop='8px';
-  const editBtn=document.createElement('button'); editBtn.className='small-btn'; editBtn.textContent='編集';
-  const delBtn=document.createElement('button'); delBtn.className='small-btn'; delBtn.textContent='削除';
+  const editBtn=document.createElement('button'); editBtn.type='button'; editBtn.className='small-btn'; editBtn.textContent='編集';
+  const delBtn=document.createElement('button'); delBtn.type='button'; delBtn.className='small-btn'; delBtn.textContent='削除';
   row.appendChild(editBtn); row.appendChild(delBtn);
   card.appendChild(row);
 
@@ -350,8 +350,8 @@ function buildHistoryCard(key, data){
     const i3=document.createElement('input'); i3.className='edit-input'; i3.value=data.goodThings[2]||''; form.appendChild(i3);
     const ta=document.createElement('textarea'); ta.className='edit-input'; ta.style.height='72px'; ta.value=data.comment||''; form.appendChild(ta);
     const btnRow=document.createElement('div'); btnRow.style.display='flex'; btnRow.style.justifyContent='flex-end'; btnRow.style.gap='8px';
-    const saveBtn=document.createElement('button'); saveBtn.className='small-btn'; saveBtn.textContent='保存';
-    const cancelBtn=document.createElement('button'); cancelBtn.className='small-btn'; cancelBtn.textContent='キャンセル';
+    const saveBtn=document.createElement('button'); saveBtn.type='button'; saveBtn.className='small-btn'; saveBtn.textContent='保存';
+    const cancelBtn=document.createElement('button'); cancelBtn.type='button'; cancelBtn.className='small-btn'; cancelBtn.textContent='キャンセル';
     btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn); form.appendChild(btnRow);
     card.insertBefore(form, row);
 
@@ -439,12 +439,9 @@ function moveToTab(name, animate=true){
 }
 
 // --- 合成クリック抑止（短時間） ---
-// touch による縦スクロール直後にブラウザが合成クリックを投げるのを防ぐ
-// ---- 合成クリック抑止の定義（グローバル） ----
 let _ignoreClickUntil = 0;
 const BLOCK_CLICK_MS = 350; // 合成クリックを抑止する時間（ms）
 
-// キャプチャ段階で短時間のクリックを阻止（スクロールやスワイプ直後の合成クリック対策）
 document.addEventListener('click', (ev) => {
   if (Date.now() < _ignoreClickUntil) {
     ev.stopImmediatePropagation();
@@ -526,14 +523,14 @@ function enableSwipe() {
         _ignoreClickUntil = Math.max(_ignoreClickUntil, Date.now() + BLOCK_CLICK_MS);
         moveToTab(order[activeIndex]);
       } else {
-        // 小さな移動 = タップとして補償する（elementFromPoint で正しい要素を取り、クリック可能な祖先を探す）
+        // 小さな移動 = タップとして補償する（elementFromPoint で正しい要素を取り、**インタラクティブ要素のみ**クリックする）
         const clientX = touch ? touch.clientX : startX;
         const clientY = touch ? touch.clientY : startY;
         let el = document.elementFromPoint(clientX, clientY) || startTarget;
 
         if (el) {
-          // クリック対象として適切な祖先を探す（button や role=button, a, input, label など）
-          const clickable = el.closest('button, a, input, label, [role="button"], [data-clickable]') || el;
+          // ここで「クリックして良い要素」を限定する（カード本体などは除外）
+          const clickable = el.closest('button, a, input, label, [role="button"], [data-clickable]');
 
           if (clickable) {
             // label の場合は関連コントロールにフォワード
@@ -552,6 +549,7 @@ function enableSwipe() {
             // 自前で click を発火したので、後続のネイティブ合成クリックは抑止
             _ignoreClickUntil = Date.now() + BLOCK_CLICK_MS;
           }
+          // clickable が見つからなければ何もしない（カード本体への誤クリックを防ぐ）
         }
         moveToTab(order[activeIndex]);
       }
@@ -566,12 +564,6 @@ function enableSwipe() {
 
   container.addEventListener('touchcancel', () => moveToTab(order[activeIndex]));
 }
-
-
-
-
-
-
 
 /* ---------- init ---------- */
 window.addEventListener('DOMContentLoaded', ()=>{
