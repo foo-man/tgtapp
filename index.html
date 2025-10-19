@@ -4,13 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>今日の3つのいいこと 🌿</title>
-<link rel="manifest" href="./manifest.json">
-<meta name="theme-color" content="#86cfa3">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="3つのいいこと">
-<link rel="apple-touch-icon" href="./kyattorabinngu.png">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg-1:#f4fbf6;
@@ -18,739 +12,490 @@
   --accent-1:#66c08a;
   --accent-2:#4aa36a;
   --muted:#6b806f;
-  --card-shadow: 0 10px 30px rgba(32,50,40,0.08);
+  --card-shadow: 0 8px 20px rgba(32,50,40,0.07);
 }
 
-/* theme variants for four seasons */
-body[data-theme="spring"]{ --bg-1:#f0fbf6; --bg-2:#ffffff; --accent-1:#82d89a; --accent-2:#5bc07a; --muted:#5b7b63 }
-body[data-theme="summer"]{ --bg-1:#eaf8ff; --bg-2:#ffffff; --accent-1:#3fc1ff; --accent-2:#1ea8f0; --muted:#3b6b76 }
-body[data-theme="autumn"]{ --bg-1:#fff6f0; --bg-2:#ffffff; --accent-1:#f29a5b; --accent-2:#e16c3b; --muted:#6b4b36 }
-body[data-theme="winter"]{ --bg-1:#f4f7fb; --bg-2:#ffffff; --accent-1:#9fbff2; --accent-2:#6f9fe0; --muted:#4b5f75 }
+/* seasonal theme overrides */
+body[data-theme="spring"]{ --accent-1:#82d89a; --accent-2:#5bc07a; --bg-1:#f0fbf6; --muted:#5b7b63; }
+body[data-theme="summer"]{ --accent-1:#3fc1ff; --accent-2:#1ea8f0; --bg-1:#eaf8ff; --muted:#3b6b76; }
+body[data-theme="autumn"]{ --accent-1:#f29a5b; --accent-2:#e16c3b; --bg-1:#fff6f0; --muted:#6b4b36; }
+body[data-theme="winter"]{ --accent-1:#9fbff2; --accent-2:#6f9fe0; --bg-1:#f4f7fb; --muted:#4b5f75; }
 
 *{box-sizing:border-box}
 html,body{height:100%}
 body{
-  font-family: 'Noto Sans JP', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', sans-serif;
+  font-family: 'Noto Sans JP', system-ui, -apple-system, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
   background: linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 100%);
-  color: #24362b;
-  margin:0; padding:1rem; -webkit-font-smoothing:antialiased; transition:background .4s ease,color .3s ease;
+  color:#24362b; margin:0; padding:1rem; -webkit-font-smoothing:antialiased;
 }
 .container{max-width:980px;margin:0 auto;padding-bottom:4rem}
-.appbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:12px;margin-bottom:12px}
+.appbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:12px;margin-bottom:12px;background:linear-gradient(180deg,#fff,#fbfffb);box-shadow:var(--card-shadow)}
 .app-title{display:flex;align-items:center;gap:10px}
-.app-title h1{font-size:1.2rem;margin:0;color:var(--accent-2)}
-.app-actions{display:flex;gap:8px}
-.icon-btn{background:transparent;border:none;padding:8px;border-radius:10px;cursor:pointer}
-.icon-btn:focus{outline:3px solid rgba(102,187,141,0.16)}
-.card{background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.95));border-radius:18px;padding:14px;box-shadow:var(--card-shadow);margin:12px 0}
-.input-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.input-row input[type="date"]{padding:10px;border-radius:10px;border:1px solid #e0efe0;background:#fbfffb}
-.input-field{flex:1;min-width:160px}
+.app-title h1{font-size:1.1rem;margin:0;color:var(--accent-2)}
+.stats{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:0.9rem}
+
+/* common UI */
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98));
+  border-radius:14px;padding:12px;box-shadow:var(--card-shadow);margin:12px 0;
+}
 .input{width:100%;padding:10px;border-radius:12px;border:1px solid #e6efe6;background:#fbfffb;font-size:0.95rem}
 .textarea{width:100%;padding:10px;border-radius:12px;border:1px solid #e6efe6;background:#fbfffb;height:72px;resize:none}
-.btn-primary{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;border:none;padding:10px 14px;border-radius:14px;cursor:pointer;box-shadow:0 6px 18px rgba(74,163,106,0.18);transition:transform .12s ease,box-shadow .12s ease}
-.btn-primary:active{transform:translateY(1px)}
+.btn-primary{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;border:none;padding:10px 14px;border-radius:12px;cursor:pointer}
 .small-btn{background:transparent;border:1px solid rgba(36,54,43,0.06);padding:8px 10px;border-radius:10px;cursor:pointer}
-.calendar-wrap{display:flex;gap:12px;align-items:flex-start}
-#calendar{flex:1}
-.calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
-.calendar-title{font-weight:700;color:var(--muted)}
-.month-btn{background:transparent;border:none;padding:8px;border-radius:10px;cursor:pointer}
+
+/* tabs */
+.tab-nav{display:flex;gap:8px;margin-bottom:12px}
+.tab-btn{flex:1;padding:10px 12px;border-radius:12px;border:1px solid transparent;background:#fff;cursor:pointer;font-weight:700;color:var(--muted);user-select:none}
+.tab-btn.active{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff;box-shadow:0 6px 18px rgba(74,163,106,0.12)}
+
+/* panes container: クリッピングとスライド用 */
+.panes {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  z-index: 0;
+}
+.panes-track {
+  display:flex;
+  transition: transform .36s cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+  backface-visibility: hidden;
+  transform-style: preserve-3d;
+  /* track幅は自動（flex children） */
+}
+
+/* 各タブ幅はコンテナ幅と同じ（横に並ぶ） */
+.tab-pane {
+  flex: 0 0 100%;
+  padding: 12px 0 0 0;
+  min-height: 120px;
+  position: relative;
+  z-index: 1;
+}
+
+/* 非アクティブパネルのカードからシャドウを消す（アニメーションつき） */
+.tab-pane .card {
+  box-shadow: none;
+  transition: box-shadow .24s ease, transform .18s ease;
+}
+
+/* 表示中のパネルだけシャドウを戻す */
+.tab-pane.active .card {
+  box-shadow: var(--card-shadow);
+  transform: translateZ(0); /* 描画を安定させる */
+}
+
+
+/* calendar */
 .calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
-.calendar-weekday{font-size:0.85rem;font-weight:700;color:#7c947f;padding:6px 0;text-align:center}
-.calendar-cell{background:transparent;border-radius:10px;padding:10px 6px;min-height:54px;display:flex;align-items:flex-start;justify-content:flex-start;flex-direction:column;position:relative;border:1px solid transparent;cursor:pointer;transition:transform .12s ease, background .12s ease, box-shadow .12s ease}
-.calendar-cell:focus{outline:none;box-shadow:0 6px 20px rgba(36,54,43,0.08);transform:translateY(-4px)}
-.calendar-cell.empty{background:transparent;border:none;cursor:default}
+.calendar-weekday{font-size:0.85rem;text-align:center;color:#7c947f;padding:6px 0;font-weight:700}
+.calendar-cell{background:transparent;border-radius:10px;padding:8px 6px;min-height:64px;display:flex;align-items:flex-start;flex-direction:column;position:relative;border:1px solid transparent;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
+.calendar-cell:focus{outline:none;box-shadow:0 6px 20px rgba(36,54,43,0.06);transform:translateY(-4px)}
 .calendar-day{font-weight:700}
-.calendar-cell .dot{position:absolute;right:8px;bottom:8px}
+.calendar-dot{position:absolute;right:8px;bottom:8px;font-size:1rem}
 .calendar-cell.has-entry{background:linear-gradient(180deg,#f9fffa,#ffffff);border:1px solid rgba(80,160,110,0.06)}
-.calendar-cell:hover{transform:translateY(-3px)}
+
+/* history list */
 .history-list{max-height:60vh;overflow:auto;padding-right:6px}
 .history-card{background:transparent;border-radius:12px;padding:10px;border:1px solid rgba(34,62,46,0.06);margin-bottom:8px}
 .history-card h3{margin:0 0 6px 0;font-size:0.95rem}
 .history-card ul{padding:0;margin:0;list-style:none}
 .history-card li{background:#fbfffb;padding:8px;border-radius:8px;margin-bottom:6px}
-.comment-box{margin-top:6px;font-style:italic;color:var(--muted);background:linear-gradient(90deg,rgba(240,255,246,0.8), rgba(255,255,255,0.6));padding:8px;border-radius:8px;border-left:4px solid rgba(163,207,163,0.9)}
+.comment-box{margin-top:6px;font-style:italic;color:var(--muted);background:linear-gradient(90deg,rgba(240,255,246,0.8),rgba(255,255,255,0.6));padding:8px;border-radius:8px;border-left:4px solid rgba(163,207,163,0.9)}
+.history-card.editing{background:linear-gradient(90deg, rgba(250,250,250,0.98), #fff);box-shadow:0 6px 20px rgba(0,0,0,0.04)}
+.edit-input{width:100%;padding:8px;border-radius:8px;border:1px solid #e6efe6;margin-bottom:6px}
 
-/* Modal adjustments: keep consistent size and layout and use opacity for transitions */
-.modal{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:12px;z-index:2000;opacity:0;pointer-events:none;transition:opacity .28s ease}
-.modal.show{opacity:1;pointer-events:all}
-.modal-backdrop{position:absolute;inset:0;background:transparent;transition:background .28s ease}
+/* modal */
+.modal{position:fixed;inset:0;display:flex;align-items:flex-end;justify-content:center;padding:12px;z-index:2000;pointer-events:none;opacity:0;transition:opacity .22s ease}
+.modal.show{pointer-events:all;opacity:1}
+.modal-backdrop{position:absolute;inset:0;background:transparent;transition:background .22s ease}
 .modal.show .modal-backdrop{background:rgba(6,10,8,0.36)}
-.modal-card{background:white;border-radius:18px;padding:14px;width:100%;max-width:720px;box-shadow:0 28px 80px rgba(20,36,28,0.18);transform:translateY(18px) scale(.995);opacity:0;transition:transform .36s cubic-bezier(.2,.9,.2,1),opacity .36s;min-height:360px;display:flex;flex-direction:column;max-height:80vh;will-change:transform,opacity}
-.modal.show .modal-card{transform:translateY(0) scale(1);opacity:1}
-.modal-card .nav{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-.modal-card .nav .side{width:100px;display:flex;align-items:center}
-.modal-card .nav .center{flex:1;text-align:center}
-.modal-card .nav button[disabled]{opacity:0.35;cursor:not-allowed}
+.modal-card{background:white;border-radius:14px;padding:12px;width:100%;max-width:720px;box-shadow:0 28px 80px rgba(20,36,28,0.16);transform:translateY(12px);opacity:0;transition:transform .28s ease,opacity .28s;max-height:80vh;overflow:auto}
+.modal.show .modal-card{transform:translateY(0);opacity:1}
 
-/* ensure history list keeps height so modal size stable */
-.history-list-inner {
-  display:block;
-  padding:8px;
-  min-height:220px;
-}
-.no-history {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  color: var(--accent-color); /* ← テーマカラーに連動させる */
-}
-
-.no-history svg {
-  width: 60px;
-  height: 60px;
-  fill: none;
-  stroke: #ff7ab8;
-  stroke-width: 2;
-  filter: drop-shadow(0 0 10px rgba(255, 120, 180, 0.8));
-  transition: transform 0.3s ease, filter 0.3s ease;
-}
-
-.no-history svg:hover {
-  transform: scale(1.1);
-  filter: drop-shadow(0 0 15px rgba(255, 160, 200, 1));
-}
-
-
-
-
-
+/* helpers */
 .snackbar{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:var(--accent-2);color:white;padding:10px 14px;border-radius:12px;box-shadow:0 8px 24px rgba(50,90,50,0.2);visibility:hidden;opacity:0;transition:opacity .18s, visibility .18s}
 .snackbar.show{visibility:visible;opacity:1}
-.fab{position:fixed;right:18px;bottom:18px;background:linear-gradient(90deg,var(--accent-1),var(--accent-2));width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;color:white;border:none;cursor:pointer;box-shadow:0 12px 36px rgba(54,100,74,0.22)}
-.sakura{position:fixed;top:-2rem;pointer-events:none;z-index:1500;animation:sakuraFall 2.6s linear forwards}
-@keyframes sakuraFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(360deg);opacity:0}}
-@media (max-width:720px){.calendar-wrap{flex-direction:column}.calendar-cell{min-height:64px}.appbar{padding:8px}.modal-card{min-height:320px}}
+.no-history{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);padding:12px}
 
-.history-card input.modal-good,
-.history-card textarea.modal-comment {
-  width: 100%;
-  margin-bottom: 6px;
-  padding: 8px;
-  border-radius: 10px;
-  border: 1px solid #e6efe6;
-  font-size: 0.95rem;
-  box-sizing: border-box;
+@media (max-width:720px){
+  .calendar-grid{grid-template-columns:repeat(7,1fr)}
+  .history-card{padding:8px}
 }
-
-.history-card button.small-btn {
-  padding: 6px 10px;
-}
-
-
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="appbar card">
+  <div class="appbar" role="banner">
     <div class="app-title">
       <div style="font-size:1.6rem">🍀</div>
       <div>
         <h1>今日の3つのいいこと</h1>
-        <div style="font-size:0.8rem;color:var(--muted)">習慣化のための小さな日記</div>
+        <div class="stats">
+          <div id="streak">連続: 0日</div>
+          <div id="total">総いいこと: 0</div>
+        </div>
       </div>
     </div>
-    <div class="app-actions">
-      <button class="icon-btn" id="showAllBtnTop" title="すべての履歴を見る">📚</button>
-      <button class="icon-btn" id="themeToggle" title="テーマ切替">⚙️</button>
+
+    <div style="display:flex;align-items:center;gap:8px">
+      <button id="themeToggle" class="small-btn" aria-label="テーマ切替">🌸</button>
     </div>
   </div>
 
-  <section class="card" aria-labelledby="inputSection">
-    <div id="inputSection" style="display:none">入力</div>
-    <div class="input-row">
-      <div class="input-field" style="max-width:200px">
-        <label for="entryDateInput" style="display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px">日付</label>
-        <input type="date" id="entryDateInput" aria-label="日付選択" class="input">
-      </div>
-      <div style="flex:1;display:flex;gap:8px;align-items:center;justify-content:flex-end">
-        <button class="small-btn" id="prevMonthBtn" aria-label="前の月">◀</button>
-        <div class="calendar-title" id="calendarTitle" aria-live="polite"></div>
-        <button class="small-btn" id="nextMonthBtn" aria-label="次の月">▶</button>
-      </div>
-    </div>
-
-    <div style="margin-top:10px;display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-      <input id="good1" placeholder="いいこと①" aria-label="いいこと1" class="input">
-      <input id="good2" placeholder="いいこと②" aria-label="いいこと2" class="input">
-      <input id="good3" placeholder="いいこと③" aria-label="いいこと3" class="input">
-    </div>
-    <textarea id="comment" placeholder="今日のひとことメモ" aria-label="ひとことメモ" class="textarea" style="margin-top:10px"></textarea>
-
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
-      <div style="font-size:0.85rem;color:var(--muted)">入力を保存すると季節の演出が表示されます 🌸</div>
-      <button class="btn-primary" id="saveBtn">保存</button>
-    </div>
-  </section>
-
-  <div class="card calendar-wrap" id="calendar">
-    <div style="flex:1">
-      <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="カレンダー"></div>
-    </div>
-    <aside style="width:320px;max-width:40%;min-width:260px">
-      <div style="font-weight:700;color:var(--muted);margin-bottom:8px">最近の記録</div>
-      <div class="history-list card" id="recentList" style="max-height:60vh;overflow:auto;padding:10px"></div>
-    </aside>
+  <!-- tabs -->
+  <div class="tab-nav" role="tablist" aria-label="メインタブ">
+    <button class="tab-btn active" role="tab" aria-selected="true" data-tab="today">🌿 今日</button>
+    <button class="tab-btn" role="tab" data-tab="calendar">📅 カレンダー</button>
+    <button class="tab-btn" role="tab" data-tab="history">📖 履歴</button>
   </div>
 
+  <!-- panes -->
+  <div class="panes" id="panes" aria-live="polite">
+    <div class="panes-track" id="panesTrack">
+      <div id="tab-today" class="tab-pane">
+        <div class="card">
+          <div style="display:flex;gap:12px;align-items:flex-end">
+            <div style="flex:0 0 200px">
+              <label for="entryDateInput" style="display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px">日付</label>
+              <input type="date" id="entryDateInput" class="input" />
+            </div>
+            <div style="flex:1">
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+                <input id="good1" placeholder="いいこと①" class="input" />
+                <input id="good2" placeholder="いいこと②" class="input" />
+                <input id="good3" placeholder="いいこと③" class="input" />
+              </div>
+            </div>
+          </div>
+
+          <textarea id="comment" class="textarea" placeholder="今日のひとことメモ" style="margin-top:12px"></textarea>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px">
+            <div style="font-size:0.85rem;color:var(--muted)">保存するとカレンダーにマークが付きます 🌸</div>
+            <div style="display:flex;gap:8px">
+              <button id="saveBtn" class="btn-primary">保存</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-calendar" class="tab-pane">
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+            <div id="calendarTitle" style="font-weight:700;color:var(--muted)"></div>
+            <div>
+              <button id="prevMonthBtn" class="small-btn">◀</button>
+              <button id="nextMonthBtn" class="small-btn">▶</button>
+            </div>
+          </div>
+
+          <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="カレンダー"></div>
+
+          <div style="margin-top:12px;font-weight:700;color:var(--muted)">最近の記録</div>
+          <div id="recentList" class="history-list" style="padding:10px;margin-top:6px"></div>
+        </div>
+      </div>
+
+      <div id="tab-history" class="tab-pane">
+        <div class="card">
+          <div style="font-weight:700;color:var(--muted);margin-bottom:8px">すべての履歴</div>
+          <div id="historyListView" class="history-list" style="padding:10px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<!-- モーダル -->
-<div id="historyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalDateTitle" aria-hidden="true">
-  <div class="modal-backdrop" onclick="closeModalByBackdrop(event)"></div>
-  <div class="modal-card" role="document" aria-describedby="historyList" tabindex="-1">
-    <div class="nav">
-      <div><button class="small-btn" id="prevDayBtn">◀ 前日</button></div>
-      <div class="center"><h2 id="modalDateTitle">📅</h2></div>
-      <div class="side" style="justify-content:flex-end"><button class="small-btn" id="nextDayBtn">翌日 ▶</button></div>
+<!-- modal -->
+<div id="historyModal" class="modal" aria-hidden="true">
+  <div class="modal-backdrop"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" tabindex="-1">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+      <button id="prevDayBtn" class="small-btn">◀ 前日</button>
+      <h3 id="modalDateTitle">📅</h3>
+      <button id="nextDayBtn" class="small-btn">翌日 ▶</button>
     </div>
 
-    <div id="historyList" class="history-list">
-      <div class="history-list-inner" id="historyListInner"></div>
+    <div id="historyList" class="history-list" style="min-height:120px;padding:6px"></div>
+
+    <div style="text-align:right;margin-top:8px">
+      <button id="closeModalBtn" class="small-btn">閉じる</button>
     </div>
-    <div style="text-align:right;margin-top:12px"><button class="small-btn" id="closeModalBtn">閉じる</button></div>
   </div>
 </div>
 
 <div id="snackbar" class="snackbar" role="status" aria-live="polite">保存しました</div>
-<button id="fabSave" class="fab" title="保存">💾</button>
 
 <script>
-/* ---------- 状態 ---------- */
+/* ---------- state ---------- */
 let selectedDate = new Date();
 let modalDate = new Date();
-let isShowingAllHistory = false;
-let _lockedScrollY = 0;
-let _savedBodyPaddingRight = '';
-let _useIosScrollLock = /iP(ad|hone|od)/.test(navigator.platform) || (navigator.userAgent.includes('Macintosh') && 'ontouchend' in document);
-let _lastFocusedElement = null;
+let lastActive = 'today';
+let currentTheme = localStorage.getItem('theme') || 'spring';
 
-/* ---------- ヘルパー ---------- */
-function formatDate(d){
-  const y = d.getFullYear();
-  const m = ('0'+(d.getMonth()+1)).slice(-2);
-  const day = ('0'+d.getDate()).slice(-2);
-  return `${y}-${m}-${day}`;
-}
-function escapeHTML(str){
-  if(str === null || str === undefined) return '';
-  return String(str)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;')
-    .replace(/'/g,'&#39;');
-}
-function getScrollbarWidth(){ return window.innerWidth - document.documentElement.clientWidth; }
+/* ---------- helpers ---------- */
+function pad(n){ return n < 10 ? '0' + n : ''+n; }
+function formatDate(d){ return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()); }
+function parseDateKey(key){ const [y,m,d]=key.split('-').map(Number); return new Date(y,m-1,d); }
+function showSnackbar(msg='保存しました'){ const s=document.getElementById('snackbar'); s.textContent=msg; s.classList.add('show'); setTimeout(()=>s.classList.remove('show'),1400); }
 
-/* ---------- スクロールロック ---------- */
-function lockBodyScroll(){
-  _lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-  const sbWidth = getScrollbarWidth();
-  if(sbWidth > 0){
-    _savedBodyPaddingRight = document.body.style.paddingRight || '';
-    const current = parseFloat(getComputedStyle(document.body).paddingRight) || 0;
-    document.body.style.paddingRight = (current + sbWidth) + 'px';
-  }
-  if(_useIosScrollLock){
-    document.documentElement.style.overflow = 'hidden';
-    document.body.style.overflow = 'hidden';
-  } else {
-    document.body.style.position = 'fixed';
-    document.body.style.top = `-${_lockedScrollY}px`;
-    document.body.style.left = '0';
-    document.body.style.right = '0';
-  }
+/* ---------- theme ---------- */
+function applyTheme(t){
+  currentTheme = t; localStorage.setItem('theme', t);
+  document.body.setAttribute('data-theme', t);
+  const icons = { spring:'🌸', summer:'🌊', autumn:'🍂', winter:'❄️' };
+  const btn = document.getElementById('themeToggle');
+  if(btn) btn.textContent = icons[t] || '🌸';
 }
-function unlockBodyScroll(){
-  if(_useIosScrollLock){
-    document.documentElement.style.overflow = '';
-    document.body.style.overflow = '';
-  } else {
-    document.body.style.position = '';
-    document.body.style.top = '';
-    document.body.style.left = '';
-    document.body.style.right = '';
-    window.scrollTo(0, _lockedScrollY);
+function cycleTheme(){ const order=['spring','summer','autumn','winter']; let i=order.indexOf(currentTheme); i=(i+1)%order.length; applyTheme(order[i]); showSnackbar('テーマ: '+order[i]); }
+
+/* ---------- stats ---------- */
+function updateStats(){
+  const keys = Object.keys(localStorage).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse();
+  let total = 0;
+  keys.forEach(k=>{
+    try{ const d=JSON.parse(localStorage.getItem(k)); if(!d||!d.goodThings) return; d.goodThings.forEach(x=>{ if(x && x.trim()) total++; }); }catch(e){}
+  });
+  document.getElementById('total').textContent = '総いいこと: ' + total;
+
+  let streak=0; let cur=new Date();
+  while(true){
+    const k=formatDate(cur);
+    if(localStorage.getItem(k)){ streak++; cur.setDate(cur.getDate()-1); } else break;
   }
-  if(_savedBodyPaddingRight !== ''){
-    document.body.style.paddingRight = _savedBodyPaddingRight;
-  } else {
-    document.body.style.paddingRight = '';
-  }
-  _savedBodyPaddingRight = '';
+  document.getElementById('streak').textContent = '連続: ' + streak + '日';
 }
 
-/* ---------- スナックバー ---------- */
-function showSnackbar(msg = '保存しました'){
-  const s = document.getElementById('snackbar');
-  s.textContent = msg;
-  s.classList.add('show');
-  setTimeout(()=> s.classList.remove('show'), 1600);
-}
-
-/* ---------- 保存 ---------- */
+/* ---------- save ---------- */
 function saveGoodThings(){
   const key = document.getElementById('entryDateInput').value || formatDate(new Date());
-  const good1 = document.getElementById('good1').value.trim();
-  const good2 = document.getElementById('good2').value.trim();
-  const good3 = document.getElementById('good3').value.trim();
+  const g1 = document.getElementById('good1').value.trim();
+  const g2 = document.getElementById('good2').value.trim();
+  const g3 = document.getElementById('good3').value.trim();
   const comment = document.getElementById('comment').value.trim();
+  if(!g1 && !g2 && !g3 && !comment){ alert('少なくとも1つ入力してください。'); return; }
+  const data = { goodThings:[g1,g2,g3], comment };
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch(e){ alert('保存に失敗しました'); return; }
 
-  if(!good1 && !good2 && !good3 && !comment){
-    alert('少なくとも1つ入力してください。');
-    return;
-  }
+  renderCalendar(); renderRecentList(); renderHistoryList(); updateStats();
 
-  const data = { goodThings:[good1, good2, good3], comment: comment };
-  try {
-    localStorage.setItem(key, JSON.stringify(data));
-  } catch (err){
-    console.error('localStorage set failed', err);
-    alert('保存に失敗しました（ストレージがいっぱいか、プライベートモードの可能性があります）。');
-    return;
-  }
+  document.getElementById('good1').value=''; document.getElementById('good2').value=''; document.getElementById('good3').value=''; document.getElementById('comment').value='';
 
-  renderCalendar();
-  renderRecentList();
-  document.getElementById('good1').value='';
-  document.getElementById('good2').value='';
-  document.getElementById('good3').value='';
-  document.getElementById('comment').value='';
-  createSeasonalEffect();
-  showSnackbar('保存しました');
+  createSeasonalEffect(); showSnackbar('保存しました');
 }
 
-/* ---------- カレンダー ---------- */
+/* ---------- calendar ---------- */
 function renderCalendar(){
-  const grid = document.getElementById('calendarGrid');
-  grid.style.opacity = 0;
-  setTimeout(()=>{
-    grid.innerHTML = '';
-    const year = selectedDate.getFullYear();
-    const month = selectedDate.getMonth();
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month+1, 0);
-    document.getElementById('calendarTitle').textContent = `${year}年 ${month+1}月`;
+  const grid=document.getElementById('calendarGrid'); grid.innerHTML='';
+  const year=selectedDate.getFullYear(), month=selectedDate.getMonth();
+  const firstDay = new Date(year,month,1), lastDay=new Date(year,month+1,0);
+  const weekdays=['日','月','火','水','木','金','土']; weekdays.forEach(w=>{ const el=document.createElement('div'); el.className='calendar-weekday'; el.textContent=w; grid.appendChild(el); });
 
-    const weekdays = ['日','月','火','水','木','金','土'];
-    weekdays.forEach((d,i)=>{
-      const c = document.createElement('div');
-      c.textContent = d;
-      c.className = 'calendar-weekday';
-      grid.appendChild(c);
+  for(let i=0;i<firstDay.getDay();i++){ const empty=document.createElement('div'); empty.className='calendar-cell empty'; empty.setAttribute('aria-hidden','true'); grid.appendChild(empty); }
+  for(let d=1; d<=lastDay.getDate(); d++){
+    const date=new Date(year,month,d); const key=formatDate(date);
+    const cell=document.createElement('div'); cell.className='calendar-cell'; cell.tabIndex=0; cell.setAttribute('role','button'); cell.setAttribute('aria-label', `${year}年 ${month+1}月 ${d}日 の履歴を開く`);
+    const dayNum=document.createElement('div'); dayNum.className='calendar-day'; dayNum.textContent=d; cell.appendChild(dayNum);
+    if(localStorage.getItem(key)){ cell.classList.add('has-entry'); const dot=document.createElement('div'); dot.className='calendar-dot'; dot.textContent='🌸'; cell.appendChild(dot); }
+    cell.addEventListener('click', ()=> showHistoryModal(date));
+    cell.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); showHistoryModal(date); }});
+    grid.appendChild(cell);
+  }
+  document.getElementById('calendarTitle').textContent = `${year}年 ${month+1}月`;
+}
+
+/* ---------- history list builders ---------- */
+function buildHistoryCard(key, data){
+  const card=document.createElement('div'); card.className='history-card';
+  const h=document.createElement('h3'); h.textContent=key; card.appendChild(h);
+
+  const content=document.createElement('div'); const ul=document.createElement('ul');
+  const li1=document.createElement('li'); li1.textContent='① ' + (data.goodThings[0]||''); ul.appendChild(li1);
+  const li2=document.createElement('li'); li2.textContent='② ' + (data.goodThings[1]||''); ul.appendChild(li2);
+  const li3=document.createElement('li'); li3.textContent='③ ' + (data.goodThings[2]||''); ul.appendChild(li3);
+  content.appendChild(ul);
+  if(data.comment){ const cm=document.createElement('div'); cm.className='comment-box'; cm.textContent = data.comment; content.appendChild(cm); }
+  card.appendChild(content);
+
+  const row=document.createElement('div'); row.style.display='flex'; row.style.justifyContent='flex-end'; row.style.gap='8px'; row.style.marginTop='8px';
+  const editBtn=document.createElement('button'); editBtn.className='small-btn'; editBtn.textContent='編集';
+  const delBtn=document.createElement('button'); delBtn.className='small-btn'; delBtn.textContent='削除';
+  row.appendChild(editBtn); row.appendChild(delBtn);
+  card.appendChild(row);
+
+  delBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); if(!confirm('この記録を削除してもよいですか？')) return; localStorage.removeItem(key); renderCalendar(); renderRecentList(); renderHistoryList(); updateStats(); const m=document.getElementById('historyModal'); if(m.classList.contains('show')) closeModal(); });
+
+  editBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); if(card.classList.contains('editing')) return; card.classList.add('editing'); content.style.display='none';
+    const form=document.createElement('div'); form.style.display='flex'; form.style.flexDirection='column'; form.style.gap='6px';
+    const i1=document.createElement('input'); i1.className='edit-input'; i1.value=data.goodThings[0]||''; form.appendChild(i1);
+    const i2=document.createElement('input'); i2.className='edit-input'; i2.value=data.goodThings[1]||''; form.appendChild(i2);
+    const i3=document.createElement('input'); i3.className='edit-input'; i3.value=data.goodThings[2]||''; form.appendChild(i3);
+    const ta=document.createElement('textarea'); ta.className='edit-input'; ta.style.height='72px'; ta.value=data.comment||''; form.appendChild(ta);
+    const btnRow=document.createElement('div'); btnRow.style.display='flex'; btnRow.style.justifyContent='flex-end'; btnRow.style.gap='8px';
+    const saveBtn=document.createElement('button'); saveBtn.className='small-btn'; saveBtn.textContent='保存';
+    const cancelBtn=document.createElement('button'); cancelBtn.className='small-btn'; cancelBtn.textContent='キャンセル';
+    btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn); form.appendChild(btnRow);
+    card.insertBefore(form, row);
+
+    saveBtn.addEventListener('click', ()=>{
+      const updated={ goodThings:[i1.value.trim(), i2.value.trim(), i3.value.trim()], comment: ta.value.trim() };
+      try{ localStorage.setItem(key, JSON.stringify(updated)); } catch(e){ alert('保存に失敗しました'); return; }
+      const newCard = buildHistoryCard(key, updated);
+      card.replaceWith(newCard);
+      renderCalendar(); renderRecentList(); renderHistoryList(); updateStats();
+      showSnackbar('更新しました');
     });
 
-    for(let i=0;i<firstDay.getDay();i++){
-      const empty = document.createElement('div');
-      empty.className = 'calendar-cell empty';
-      empty.setAttribute('aria-hidden','true');
-      grid.appendChild(empty);
-    }
-    for(let d=1; d<=lastDay.getDate(); d++){
-      const date = new Date(year, month, d);
-      const key = formatDate(date);
-      const cell = document.createElement('div');
-      cell.className = 'calendar-cell';
-      if(localStorage.getItem(key)) cell.classList.add('has-entry');
-      cell.tabIndex = 0;
-      cell.setAttribute('role','button');
-      cell.setAttribute('aria-label', `${year}年 ${month+1}月 ${d}日 の履歴を開く`);
-
-      const dayNum = document.createElement('div');
-      dayNum.className = 'calendar-day';
-      dayNum.textContent = d;
-      cell.appendChild(dayNum);
-
-      if(localStorage.getItem(key)){
-        const dot = document.createElement('div'); dot.className='dot'; dot.textContent='🌸'; cell.appendChild(dot);
-      }
-
-      cell.addEventListener('click', ()=> showHistoryModal(date));
-      cell.addEventListener('keydown', (e)=> { if(e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHistoryModal(date); }});
-      grid.appendChild(cell);
-    }
-
-    grid.style.opacity = 1;
-  }, 80);
-}
-
-/* ---------- 最近の記録サイドリスト ---------- */
-function renderRecentList(){
-  const container = document.getElementById('recentList');
-  container.innerHTML = '';
-  const keys = Object.keys(localStorage).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse().slice(0,15);
-  if(keys.length===0){
-  container.innerHTML = '<div class="no-history">❤️ まだ履歴がありません。</div>';
-  return;
-}
-
-  keys.forEach(k=>{
-    try{
-      const d = JSON.parse(localStorage.getItem(k));
-      if(!d) return;
-      const el = buildHistoryCard(k,d,true);
-      container.appendChild(el);
-    }catch(err){console.warn(err)}
+    cancelBtn.addEventListener('click', ()=>{ form.remove(); content.style.display=''; card.classList.remove('editing'); });
   });
-}
-
-/* ---------- モーダル表示 ---------- */
-function showHistoryModal(date){
-  modalDate = new Date(date);
-  isShowingAllHistory = false;
-  const modal = document.getElementById('historyModal');
-  const list = document.getElementById('historyListInner') || document.getElementById('historyList');
-  const title = document.getElementById('modalDateTitle');
-  const key = formatDate(modalDate);
-
-  title.textContent = `📅 ${key}`;
-  list.innerHTML = '';
-
-  const raw = localStorage.getItem(key);
-  if(raw){
-    try {
-      const data = JSON.parse(raw);
-      if(data && data.goodThings){
-        const card = buildHistoryCard(key, data, false);
-        list.appendChild(card);
-      } else {
-        showNoHistoryMessage(list);
-      }
-    } catch (err) {
-      console.warn('showHistoryModal: skip invalid JSON for key', key, err);
-      showNoHistoryMessage(list);
-    }
-  } else {
-    showNoHistoryMessage(list);
-  }
-
-  // enable/disable prev/next
-  setNavStateForModal(false);
-
-  _lastFocusedElement = document.activeElement;
-  lockBodyScroll();
-  modal.setAttribute('aria-hidden','false');
-  // force reflow (helps ensure transition starts reliably)
-  void modal.offsetWidth;
-  modal.classList.add('show');
-  setTimeout(()=> document.querySelector('#historyModal .modal-card').focus(), 120);
-}
-
-function showNoHistoryMessage(container){
-  const node = document.createElement('div'); 
-  node.className = 'no-history';
-  node.innerHTML = `
-    <svg viewBox="0 0 24 24" width="60" height="60"
-      xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 
-       2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 
-       19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-    </svg>
-    <div style="font-weight:700;">まだ履歴がありません</div>
-    <div style="font-size:0.9rem;color:var(--muted);text-align:center;max-width:280px">
-      その日は記録がありません。気軽に1つだけでも書いてみましょう 💌
-    </div>
-  `;
-  container.appendChild(node);
-}
-
-
-
-
-function closeModalByBackdrop(e){
-  if(e.target.classList && e.target.classList.contains('modal-backdrop')){
-    closeModal();
-  }
-}
-function closeModal(){
-  const modal = document.getElementById('historyModal');
-  // start hide animation
-  modal.classList.remove('show');
-  modal.setAttribute('aria-hidden','true');
-
-  // wait for transitionend on the modal (fallback to timeout)
-  const cleanup = ()=>{
-    unlockBodyScroll();
-    if(_lastFocusedElement) _lastFocusedElement.focus();
-  };
-  const onEnd = (e)=>{
-    if(e.target === modal){
-      modal.removeEventListener('transitionend', onEnd);
-      cleanup();
-    }
-  };
-  modal.addEventListener('transitionend', onEnd);
-  // fallback in case transitionend doesn't fire
-  setTimeout(()=>{
-    if(modal.classList.contains('show') === false){ cleanup(); }
-  }, 420);
-}
-
-function prevDay(){ modalDate.setDate(modalDate.getDate()-1); showHistoryModal(modalDate); }
-function nextDay(){ modalDate.setDate(modalDate.getDate()+1); showHistoryModal(modalDate); }
-
-/* ---------- 全履歴 ---------- */
-function showAllHistory(){
-  isShowingAllHistory = true;
-  const modal = document.getElementById('historyModal');
-  const list = document.getElementById('historyListInner') || document.getElementById('historyList');
-  const title = document.getElementById('modalDateTitle');
-  list.innerHTML = '';
-  title.textContent = '📖 すべての履歴';
-
-  const keys = Object.keys(localStorage).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse();
-  if(keys.length === 0){ showNoHistoryMessage(list); }
-  else{
-    keys.forEach(k=>{
-      try{
-        const raw = localStorage.getItem(k);
-        if(!raw) return;
-        const d = JSON.parse(raw); if(!d || !d.goodThings) return;
-        const card = buildHistoryCard(k,d,false);
-        list.appendChild(card);
-      }catch(err){console.warn('showAllHistory: skip invalid JSON for key', k, err)}
-    });
-  }
-
-  // disable prev/next while viewing all
-  setNavStateForModal(true);
-
-  _lastFocusedElement = document.activeElement;
-  lockBodyScroll();
-  modal.setAttribute('aria-hidden','false');
-  void modal.offsetWidth;
-  modal.classList.add('show');
-  setTimeout(()=> document.querySelector('#historyModal .modal-card').focus(), 120);
-}
-
-function setNavStateForModal(disable){ document.getElementById('prevDayBtn').disabled = disable; document.getElementById('nextDayBtn').disabled = disable; }
-
-/* ---------- 削除 ---------- */
-function deleteEntry(key){
-  if(!confirm('この記録を削除してもよろしいですか?')) return;
-  localStorage.removeItem(key);
-  renderCalendar();
-  renderRecentList();
-  if(isShowingAllHistory) showAllHistory();
-  else showHistoryModal(modalDate);
-}
-
-/* ---------- 履歴カード作成（安全） ---------- */
-function buildHistoryCard(key, data, compact=false){
-  const card = document.createElement('div');
-  card.className = 'history-card';
-
-  const h3 = document.createElement('h3');
-  h3.textContent = key;
-  card.appendChild(h3);
-
-  const ul = document.createElement('ul');
-  const li1 = document.createElement('li'); li1.textContent = `① ${data.goodThings[0]||''}`; ul.appendChild(li1);
-  const li2 = document.createElement('li'); li2.textContent = `② ${data.goodThings[1]||''}`; ul.appendChild(li2);
-  const li3 = document.createElement('li'); li3.textContent = `③ ${data.goodThings[2]||''}`; ul.appendChild(li3);
-  card.appendChild(ul);
-
-  if(data.comment){
-    const cm = document.createElement('div'); cm.className = 'comment-box'; cm.textContent = data.comment; card.appendChild(cm);
-  }
-
-  const btnRow = document.createElement('div'); btnRow.style.marginTop='8px'; btnRow.style.display='flex'; btnRow.style.gap='8px'; btnRow.style.justifyContent='flex-end';
-  const edit = document.createElement('button'); 
-edit.className='small-btn'; 
-edit.textContent='編集'; 
-edit.onclick = ()=> enableModalEdit(key, card);
-  const del = document.createElement('button'); del.className='small-btn'; del.textContent='削除'; del.onclick = ()=> deleteEntry(key);
-  btnRow.appendChild(edit); btnRow.appendChild(del);
-  card.appendChild(btnRow);
 
   return card;
 }
 
-function enableModalEdit(key, cardElement){
-  // すでに編集中なら何もしない
-  if (cardElement.classList.contains('editing')) return;
-  cardElement.classList.add('editing');
-
-  const raw = localStorage.getItem(key);
-  if(!raw) return;
-  const data = JSON.parse(raw);
-
-  // 既存表示を非表示に
-  const ul = cardElement.querySelector('ul');
-  const commentDiv = cardElement.querySelector('.comment-box');
-  if (ul) ul.style.display = 'none';
-  if (commentDiv) commentDiv.style.display = 'none';
-
-  // 編集用 inputs
-  const inputs = [];
-  data.goodThings.forEach((item,i)=>{
-    const input = document.createElement('input');
-    input.type = 'text';
-    input.value = item || '';
-    input.className = 'modal-good';
-    cardElement.insertBefore(input, ul);
-    inputs.push(input);
+function renderRecentList(){
+  const container=document.getElementById('recentList'); container.innerHTML='';
+  const keys=Object.keys(localStorage).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse().slice(0,12);
+  if(keys.length===0){ container.innerHTML='<div class="no-history">まだ履歴がありません。</div>'; return; }
+  keys.forEach(k=>{
+    try{ const d=JSON.parse(localStorage.getItem(k)); if(!d) return; const el=buildHistoryCard(k,d); el.style.cursor='pointer'; el.addEventListener('click', ()=> showHistoryModal(parseDateKey(k))); container.appendChild(el); } catch(e){}
   });
-
-  // 編集用 textarea
-  const textarea = document.createElement('textarea');
-  textarea.className = 'modal-comment';
-  textarea.value = data.comment || '';
-  cardElement.insertBefore(textarea, commentDiv);
-
-  // 保存ボタン
-  const saveBtn = document.createElement('button');
-  saveBtn.textContent = '保存';
-  saveBtn.className = 'small-btn';
-  saveBtn.style.marginTop = '6px';
-  saveBtn.onclick = ()=>{
-    const updated = {
-      goodThings: inputs.map(i=>i.value.trim()),
-      comment: textarea.value.trim()
-    };
-    localStorage.setItem(key, JSON.stringify(updated));
-    renderCalendar();
-    renderRecentList();
-
-    // モーダル内ならモーダル更新
-    const modal = document.getElementById('historyModal');
-    if (modal.classList.contains('show')) showHistoryModal(new Date(key));
-    else renderRecentList(); // 最近リストだけの場合
-  };
-  cardElement.appendChild(saveBtn);
-
-  // キャンセルボタン
-  const cancelBtn = document.createElement('button');
-  cancelBtn.textContent = 'キャンセル';
-  cancelBtn.className = 'small-btn';
-  cancelBtn.style.marginTop = '6px';
-  cancelBtn.onclick = ()=>{
-    // モーダル内ならモーダル更新
-    const modal = document.getElementById('historyModal');
-    if (modal.classList.contains('show')) showHistoryModal(new Date(key));
-    else renderRecentList(); // 最近リストだけの場合
-  };
-  cardElement.appendChild(cancelBtn);
 }
 
-
-
-/* ---------- 編集モード（履歴をフォームへ読み込む） ---------- */
-function loadEntryToForm(key){
-  const raw = localStorage.getItem(key);
-  if(!raw) return;
-  try{
-    const d = JSON.parse(raw);
-    document.getElementById('entryDateInput').value = key;
-    document.getElementById('good1').value = d.goodThings[0] || '';
-    document.getElementById('good2').value = d.goodThings[1] || '';
-    document.getElementById('good3').value = d.goodThings[2] || '';
-    document.getElementById('comment').value = d.comment || '';
-    window.scrollTo({top:0,behavior:'smooth'});
-    document.getElementById('good1').focus();
-    showSnackbar('編集モード: 内容を更新して保存してください');
-  }catch(err){console.warn('loadEntryToForm',err)}
+function renderHistoryList(){
+  const container=document.getElementById('historyListView'); container.innerHTML='';
+  const keys=Object.keys(localStorage).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse();
+  if(keys.length===0){ container.innerHTML='<div class="no-history">まだ履歴がありません。</div>'; return; }
+  keys.forEach(k=>{
+    try{ const d=JSON.parse(localStorage.getItem(k)); if(!d) return; const el=buildHistoryCard(k,d); container.appendChild(el); } catch(e){}
+  });
 }
 
-/* ---------- 季節演出（保存時に表示） ---------- */
-const THEMES = ['spring','summer','autumn','winter'];
-
-function applyTheme(t){
-  document.body.setAttribute('data-theme', t);
-  try { localStorage.setItem('theme', t); } catch(e) {}
-  const btn = document.getElementById('themeToggle');
-  const icons = {spring:'🌸', summer:'🌊', autumn:'🍁', winter:'❄️'};
-  if (btn) btn.textContent = icons[t] || '🌸';
+/* ---------- modal ---------- */
+function showHistoryModal(date){
+  modalDate = new Date(date); const key=formatDate(modalDate);
+  document.getElementById('modalDateTitle').textContent = '📅 ' + key;
+  const list=document.getElementById('historyList'); list.innerHTML='';
+  const raw=localStorage.getItem(key);
+  if(raw){ try{ const d=JSON.parse(raw); list.appendChild(buildHistoryCard(key,d)); } catch(e){ list.innerHTML='<div class="no-history">表示できません</div>'; } }
+  else list.innerHTML='<div class="no-history">その日は記録がありません</div>';
+  const modal=document.getElementById('historyModal'); modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); document.querySelector('.modal-card').focus();
 }
+function closeModal(){ const modal=document.getElementById('historyModal'); modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
 
-function cycleTheme(){
-  const cur = localStorage.getItem('theme') || 'spring';
-  const idx = THEMES.indexOf(cur);
-  const next = THEMES[(idx + 1) % THEMES.length];
-  applyTheme(next);
-  showSnackbar('テーマ: ' + next);
-}
-
+/* seasonal effect */
 function createSeasonalEffect(){
-  const theme = localStorage.getItem('theme') || 'spring';
-  const effects = {
-    spring: '🌸',
-    summer: '⚪',
-    autumn: '🍂',
-    winter: '❄️'
-  };
-  const emoji = effects[theme] || '🌸';
-  for(let i = 0; i < 10; i++){
-    const el = document.createElement('div');
-    el.className = 'sakura';
-    el.textContent = emoji;
-    el.style.left = (Math.random() * 82 + 6) + '%';
-    el.style.fontSize = (14 + Math.random() * 26) + 'px';
-    el.style.animationDuration = (2.2 + Math.random() * 1.4) + 's';
-    el.style.transform = `translateX(${(Math.random() * 40) - 20}px)`;
+  const map={spring:'🌸', summer:'🌊', autumn:'🍂', winter:'❄️'}; const emoji = map[currentTheme]||'🌸';
+  for(let i=0;i<10;i++){
+    const el=document.createElement('div'); el.textContent=emoji; el.style.position='fixed'; el.style.left=(6+Math.random()*88)+'%'; el.style.top='-2rem';
+    el.style.fontSize=(12+Math.random()*28)+'px'; el.style.pointerEvents='none'; el.style.zIndex=1500; el.style.transition='transform 3s linear, opacity 3s linear';
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 3400);
+    requestAnimationFrame(()=>{ el.style.transform = `translateY(${110 + Math.random()*40}vh) rotate(${Math.random()*360}deg)`; el.style.opacity='0'; });
+    setTimeout(()=>el.remove(),3200);
   }
 }
 
-/* ---------- Service Worker 登録（キャッシュバスト付き） ---------- */
-if('serviceWorker' in navigator){
-  window.addEventListener('load', ()=> {
-    const swUrl = './sw.js?v=' + Date.now();
-    navigator.serviceWorker.register(swUrl)
-      .then(reg => console.log('SW registered', reg))
-      .catch(err => console.warn('SW registration failed', err));
+/* ---------- tab logic: use px translate (fix for hidden/visible issues) ---------- */
+const order = ['today','calendar','history'];
+function indexOfTab(name){ return order.indexOf(name); }
+
+function moveToTab(name, animate=true){
+  const idx = indexOfTab(name);
+  if(idx < 0) return;
+  const track = document.getElementById('panesTrack');
+  const container = document.getElementById('panes');
+  const cw = container.clientWidth;
+  if(!animate) track.style.transition = 'none';
+  else track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
+  track.style.transform = `translateX(-${idx * cw}px)`;
+
+  // タブボタン更新
+  document.querySelectorAll('.tab-btn').forEach(b=>{ const is = b.dataset.tab === name; b.classList.toggle('active', is); b.setAttribute('aria-selected', is? 'true':'false'); });
+
+  // ここで各パネルに active をつける（シャドウ表示の切替用）
+  document.querySelectorAll('.tab-pane').forEach(p => {
+    p.classList.toggle('active', p.id === 'tab-' + name);
+  });
+
+  lastActive = name;
+
+  if(name === 'calendar'){ renderCalendar(); renderRecentList(); }
+  if(name === 'history'){ renderHistoryList(); }
+  adjustPanesHeight();
+}
+
+
+function adjustPanesHeight(){
+  const panes = document.getElementById('panes');
+  const idx = indexOfTab(lastActive);
+  const panesTrack = document.getElementById('panesTrack');
+  const pane = panesTrack.children[idx];
+  if(!pane) return;
+  const inner = pane.querySelector('.card') || pane;
+  const height = inner.offsetHeight + 24; // buffer
+  panes.style.height = panes.offsetHeight + 'px';
+  requestAnimationFrame(()=>{ panes.style.transition = 'height .32s cubic-bezier(.2,.9,.2,1)'; panes.style.height = height + 'px'; });
+  setTimeout(()=>{ panes.style.transition=''; panes.style.height=''; }, 360);
+}
+
+/* swipe handling using px (more reliable) */
+function enableSwipe(){
+  const track = document.getElementById('panesTrack');
+  const container = document.getElementById('panes');
+  let startX = null;
+  let startTranslate = 0;
+  let dragging = false;
+
+  track.addEventListener('touchstart', (e)=>{
+    if(e.touches.length > 1) return;
+    startX = e.touches[0].clientX;
+    const idx = indexOfTab(lastActive);
+    startTranslate = - idx * container.clientWidth;
+    dragging = true;
+    track.style.transition = 'none';
+  }, {passive:true});
+
+  track.addEventListener('touchmove', (e)=>{
+    if(!dragging || startX === null) return;
+    const dx = e.touches[0].clientX - startX;
+    track.style.transform = `translateX(${startTranslate + dx}px)`;
+    e.preventDefault();
+  }, {passive:false});
+
+  track.addEventListener('touchend', (e)=>{
+    if(!dragging) return;
+    const dx = (e.changedTouches && e.changedTouches[0]) ? (e.changedTouches[0].clientX - startX) : 0;
+    dragging = false; startX = null;
+    const threshold = 60;
+    const idx = indexOfTab(lastActive);
+    if(dx < -threshold && idx < order.length - 1) moveToTab(order[idx+1]);
+    else if(dx > threshold && idx > 0) moveToTab(order[idx-1]);
+    else moveToTab(lastActive);
   });
 }
 
-/* ---------- 初期化 ---------- */
-window.onload = ()=>{
-  const savedTheme = localStorage.getItem('theme') || 'spring';
-  applyTheme(savedTheme);
-
+/* ---------- UI init ---------- */
+window.addEventListener('DOMContentLoaded', ()=>{
+  applyTheme(currentTheme);
   document.getElementById('entryDateInput').value = formatDate(new Date());
+  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', ()=> moveToTab(btn.dataset.tab)));
+  moveToTab('today', false); // initial (no animation)
+  enableSwipe();
   document.getElementById('saveBtn').addEventListener('click', saveGoodThings);
-  document.getElementById('fabSave').addEventListener('click', saveGoodThings);
   document.getElementById('prevMonthBtn').addEventListener('click', ()=>{ selectedDate.setMonth(selectedDate.getMonth()-1); renderCalendar(); });
   document.getElementById('nextMonthBtn').addEventListener('click', ()=>{ selectedDate.setMonth(selectedDate.getMonth()+1); renderCalendar(); });
-  document.getElementById('prevDayBtn').addEventListener('click', prevDay);
-  document.getElementById('nextDayBtn').addEventListener('click', nextDay);
   document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-  document.getElementById('showAllBtnTop').addEventListener('click', showAllHistory);
+  document.querySelector('#historyModal .modal-backdrop').addEventListener('click', closeModal);
+  document.getElementById('prevDayBtn').addEventListener('click', ()=>{ modalDate.setDate(modalDate.getDate()-1); showHistoryModal(modalDate); });
+  document.getElementById('nextDayBtn').addEventListener('click', ()=>{ modalDate.setDate(modalDate.getDate()+1); showHistoryModal(modalDate); });
   document.getElementById('themeToggle').addEventListener('click', cycleTheme);
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ const modal=document.getElementById('historyModal'); if(modal.classList.contains('show')) closeModal(); } });
 
-  document.getElementById('showAllBtnTop').addEventListener('keydown', (e)=> { if(e.key==='Enter') showAllHistory(); });
-  document.getElementById('entryDateInput').addEventListener('change', (e)=>{ /* keep date selection for save */ });
-
-  renderCalendar();
-  renderRecentList();
-
-  // Esc でモーダル閉じる
-  window.addEventListener('keydown', (e)=>{
-    if(e.key === 'Escape'){
-      const modal = document.getElementById('historyModal');
-      if(modal.classList.contains('show')) closeModal();
-    }
-  });
-
-  // カレンダーセルクリックでフォーカス
-  document.addEventListener('click', (e)=>{
-    if(e.target.classList && e.target.classList.contains('calendar-cell')) e.target.focus();
-  });
-
-  // スワイプで月送り（簡易）
-  let startX = null;
-  const calWrap = document.getElementById('calendarGrid');
-  calWrap.addEventListener('touchstart', (ev)=> startX = ev.touches[0].clientX );
-  calWrap.addEventListener('touchend', (ev)=>{
-    if(startX === null) return; const endX = ev.changedTouches[0].clientX; const diff = endX - startX; if(Math.abs(diff) > 60){ if(diff>0) selectedDate.setMonth(selectedDate.getMonth()-1); else selectedDate.setMonth(selectedDate.getMonth()+1); renderCalendar(); }
-    startX = null;
-  });
-
-};
+  renderCalendar(); renderRecentList(); renderHistoryList(); updateStats();
+  setTimeout(()=> adjustPanesHeight(), 80);
+  window.addEventListener('resize', ()=>{ moveToTab(lastActive, false); adjustPanesHeight(); });
+});
 </script>
 </body>
 </html>
