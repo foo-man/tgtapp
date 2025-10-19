@@ -434,15 +434,12 @@ function enableSwipe() {
   let isSwiping = false;
   let moved = false;
 
-  const swipeThreshold = 10; // 横スワイプ判定距離
-  const moveThreshold = container.clientWidth * 0.25; // タブ切替距離
-  const slowFactor = 0.6; // 移動量を抑える
+  const swipeThreshold = 6; // 横スワイプ判定距離を敏感に
+  const moveThreshold = container.clientWidth * 0.25;
+  const slowFactor = 0.6;
 
   container.addEventListener('touchstart', e => {
     if (e.touches.length > 1) return;
-
-    const tag = e.target.tagName.toLowerCase();
-    if (['input','textarea','button'].includes(tag) || e.target.closest('.modal-card')) return;
 
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
@@ -453,8 +450,6 @@ function enableSwipe() {
   });
 
   container.addEventListener('touchmove', e => {
-    if (startX === 0 && startY === 0) return;
-
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
 
@@ -462,7 +457,7 @@ function enableSwipe() {
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) {
         isSwiping = true;
       } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > swipeThreshold) {
-        startX = startY = 0; // 縦スクロール判定で終了
+        startX = startY = 0;
         return;
       } else {
         return;
@@ -470,37 +465,35 @@ function enableSwipe() {
     }
 
     if (isSwiping) {
-      e.preventDefault();
-      // 遅めに動かす
+      e.preventDefault(); // 横スワイプ確定時のみ preventDefault
       track.style.transform = `translateX(${currentTranslate + dx * slowFactor}px)`;
       moved = true;
     }
   }, { passive: false });
 
   container.addEventListener('touchend', e => {
-    if (startX === 0 && startY === 0) return;
+    if (!moved) {
+      const el = e.target;
+      if (el && el.click) el.click();
+      moveToTab(order[activeIndex]);
+      startX = startY = 0;
+      return;
+    }
 
     const dx = e.changedTouches[0].clientX - startX;
 
     track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
 
-    if (!moved || Math.abs(dx) < swipeThreshold) {
-      // タップ扱い
-      const el = e.target;
-      if (el && el.click) el.click();
-      moveToTab(order[activeIndex]);
-    } else {
-      // 横スワイプ
-      if (dx < -moveThreshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
-      else if (dx > moveThreshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
-      else moveToTab(order[activeIndex]);
-    }
+    if (dx < -moveThreshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
+    else if (dx > moveThreshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
+    else moveToTab(order[activeIndex]);
 
     startX = startY = 0;
   });
 
   container.addEventListener('touchcancel', () => moveToTab(order[activeIndex]));
 }
+
 
 
 
