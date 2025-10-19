@@ -343,29 +343,37 @@ function buildHistoryCard(key, data){
 
   delBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); if(!confirm('この記録を削除してもよいですか？')) return; localStorage.removeItem(key); renderCalendar(); renderRecentList(); renderHistoryList(); updateStats(); const m=document.getElementById('historyModal'); if(m.classList.contains('show')) closeModal(); });
 
-  editBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); if(card.classList.contains('editing')) return; card.classList.add('editing'); content.style.display='none';
-    const form=document.createElement('div'); form.style.display='flex'; form.style.flexDirection='column'; form.style.gap='6px';
-    const i1=document.createElement('input'); i1.className='edit-input'; i1.value=data.goodThings[0]||''; form.appendChild(i1);
-    const i2=document.createElement('input'); i2.className='edit-input'; i2.value=data.goodThings[1]||''; form.appendChild(i2);
-    const i3=document.createElement('input'); i3.className='edit-input'; i3.value=data.goodThings[2]||''; form.appendChild(i3);
-    const ta=document.createElement('textarea'); ta.className='edit-input'; ta.style.height='72px'; ta.value=data.comment||''; form.appendChild(ta);
-    const btnRow=document.createElement('div'); btnRow.style.display='flex'; btnRow.style.justifyContent='flex-end'; btnRow.style.gap='8px';
-    const saveBtn=document.createElement('button'); saveBtn.type='button'; saveBtn.className='small-btn'; saveBtn.textContent='保存';
-    const cancelBtn=document.createElement('button'); cancelBtn.type='button'; cancelBtn.className='small-btn'; cancelBtn.textContent='キャンセル';
-    btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn); form.appendChild(btnRow);
-    card.insertBefore(form, row);
+  // buildHistoryCard 関数内の一部 (元のコード)
+// ...
+  // 変更後: ev.stopImmediatePropagation() を使用して、より強力にイベント伝播を停止します。
+  editBtn.addEventListener('click', (ev)=>{ 
+    ev.stopImmediatePropagation(); 
+    if(card.classList.contains('editing')) return; 
+    card.classList.add('editing'); 
+    content.style.display='none';
 
-    saveBtn.addEventListener('click', ()=>{
-      const updated={ goodThings:[i1.value.trim(), i2.value.trim(), i3.value.trim()], comment: ta.value.trim() };
-      try{ localStorage.setItem(key, JSON.stringify(updated)); } catch(e){ alert('保存に失敗しました'); return; }
-      const newCard = buildHistoryCard(key, updated);
-      card.replaceWith(newCard);
-      renderCalendar(); renderRecentList(); renderHistoryList(); updateStats();
-      showSnackbar('更新しました');
-    });
+    const form=document.createElement('div'); form.style.display='flex'; form.style.flexDirection='column'; form.style.gap='6px';
+    const i1=document.createElement('input'); i1.className='edit-input'; i1.value=data.goodThings[0]||''; form.appendChild(i1);
+    const i2=document.createElement('input'); i2.className='edit-input'; i2.value=data.goodThings[1]||''; form.appendChild(i2);
+    const i3=document.createElement('input'); i3.className='edit-input'; i3.value=data.goodThings[2]||''; form.appendChild(i3);
+    const ta=document.createElement('textarea'); ta.className='edit-input'; ta.style.height='72px'; ta.value=data.comment||''; form.appendChild(ta);
+    const btnRow=document.createElement('div'); btnRow.style.display='flex'; btnRow.style.justifyContent='flex-end'; btnRow.style.gap='8px';
+    const saveBtn=document.createElement('button'); saveBtn.type='button'; saveBtn.className='small-btn'; saveBtn.textContent='保存';
+    const cancelBtn=document.createElement('button'); cancelBtn.type='button'; cancelBtn.className='small-btn'; cancelBtn.textContent='キャンセル';
+    btnRow.appendChild(saveBtn); btnRow.appendChild(cancelBtn); form.appendChild(btnRow);
+    card.insertBefore(form, row);
 
-    cancelBtn.addEventListener('click', ()=>{ form.remove(); content.style.display=''; card.classList.remove('editing'); });
-  });
+    saveBtn.addEventListener('click', ()=>{
+      const updated={ goodThings:[i1.value.trim(), i2.value.trim(), i3.value.trim()], comment: ta.value.trim() };
+      try{ localStorage.setItem(key, JSON.stringify(updated)); } catch(e){ alert('保存に失敗しました'); return; }
+      const newCard = buildHistoryCard(key, updated);
+      card.replaceWith(newCard);
+      renderCalendar(); renderRecentList(); renderHistoryList(); updateStats();
+      showSnackbar('更新しました');
+    });
+
+    cancelBtn.addEventListener('click', ()=>{ form.remove(); content.style.display=''; card.classList.remove('editing'); });
+  });
 
   return card;
 }
