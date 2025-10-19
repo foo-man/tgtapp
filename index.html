@@ -58,14 +58,21 @@ body{
 .tab-btn.active { background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#fff; box-shadow:0 6px 18px rgba(74,163,106,0.12); }
 
 /* panes */
-.panes { position:relative; overflow:hidden; isolation:isolate; margin-top:0; }
+.panes { 
+  position: relative; 
+  overflow: hidden; 
+  isolation: isolate; 
+  margin-top: 0; 
+}
+
 .panes-track {
-  display:flex;
-  width:auto; /* auto so children size controls layout */
+  display: flex;
+  width: auto; /* auto so children size controls layout */
   transition: transform .36s cubic-bezier(.2,.9,.2,1);
   will-change: transform;
-  touch-action: pan-y;
+  touch-action: none; /* ← 横スワイプも有効にする */
 }
+
 .tab-pane {
   flex: 0 0 100%;
   padding: 12px 0 0 0;
