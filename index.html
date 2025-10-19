@@ -422,38 +422,80 @@ function moveToTab(name, animate=true){
 }
 
 /* swipe using px math */
+/* ---------- swipe handling: directional-lock (replace existing enableSwipe) ---------- */
 function enableSwipe(){
   const track = document.getElementById('panesTrack');
   const container = document.getElementById('panes');
   let startX = null;
+  let startY = null;
   let startTranslate = 0;
-  let dragging = false;
+  let isHorizontal = null; // null = not decided, true = horizontal, false = vertical
 
-  track.addEventListener('touchstart', (e)=>{
-    if(e.touches.length > 1) return;
+  // touchstart: record start positions
+  track.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) return;
     startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
     startTranslate = - activeIndex * container.clientWidth;
-    dragging = true;
+    isHorizontal = null;
+    // temporarily disable transition while dragging
     track.style.transition = 'none';
-  }, {passive:true});
+  }, { passive: true });
 
-  track.addEventListener('touchmove', (e)=>{
-    if(!dragging || startX === null) return;
+  // touchmove: decide direction first, then act only for horizontal
+  track.addEventListener('touchmove', (e) => {
+    if (startX === null || startY === null) return;
     const dx = e.touches[0].clientX - startX;
-    track.style.transform = `translateX(${startTranslate + dx}px)`;
-    e.preventDefault();
-  }, {passive:false});
+    const dy = e.touches[0].clientY - startY;
 
-  track.addEventListener('touchend', (e)=>{
-    if(!dragging) return;
+    // if not decided yet, decide when movement passes small threshold
+    if (isHorizontal === null) {
+      const threshold = 8; // small hysteresis to avoid jitter
+      if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+        isHorizontal = Math.abs(dx) > Math.abs(dy);
+      } else {
+        // too small to decide -> allow default (no preventDefault)
+        return;
+      }
+    }
+
+    if (isHorizontal) {
+      // horizontal gesture: prevent vertical scroll and move track
+      e.preventDefault();
+      track.style.transform = `translateX(${startTranslate + dx}px)`;
+    } else {
+      // vertical gesture: let browser handle scrolling. clean up transforms if any.
+      // do nothing here; allow native scroll
+    }
+  }, { passive: false });
+
+  // touchend / touchcancel: finalize
+  function finishTouch(e) {
+    if (startX === null) return;
     const dx = (e.changedTouches && e.changedTouches[0]) ? (e.changedTouches[0].clientX - startX) : 0;
-    dragging = false; startX = null;
-    const threshold = 60;
-    if(dx < -threshold && activeIndex < order.length -1) moveToTab(order[activeIndex+1]);
-    else if(dx > threshold && activeIndex > 0) moveToTab(order[activeIndex-1]);
-    else moveToTab(order[activeIndex]);
-  });
+
+    // restore transition
+    track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
+
+    // if it was vertical (or undecided), simply snap back to current tab
+    if (!isHorizontal) {
+      moveToTab(order[activeIndex]);
+    } else {
+      const threshold = 60;
+      if (dx < -threshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
+      else if (dx > threshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
+      else moveToTab(order[activeIndex]);
+    }
+
+    // reset
+    startX = startY = null;
+    isHorizontal = null;
+  }
+
+  track.addEventListener('touchend', finishTouch, { passive: true });
+  track.addEventListener('touchcancel', finishTouch, { passive: true });
 }
+
 
 /* ---------- init ---------- */
 window.addEventListener('DOMContentLoaded', ()=>{
