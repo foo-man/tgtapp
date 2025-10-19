@@ -434,6 +434,9 @@ function enableSwipe() {
   let isHorizontal = null;
   let moved = false;
 
+  const swipeThreshold = 4; // 横スワイプ判定の敏感度
+  const moveThreshold = 40; // 実際にスライド切り替えする距離
+
   track.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) return;
 
@@ -451,25 +454,15 @@ function enableSwipe() {
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
 
-    // 方向判定は最初の微小移動で決める
     if (isHorizontal === null) {
-      const threshold = 8; // ちょっと敏感に
-      if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
-        // 横スワイプか縦スクロールかを判定
+      if (Math.abs(dx) > swipeThreshold || Math.abs(dy) > swipeThreshold) {
         isHorizontal = Math.abs(dx) > Math.abs(dy);
-
-        // タップ対象ならスワイプ無効化
-        if (isHorizontal && e.target.closest('button, input, textarea, .calendar-cell')) {
-          // 子要素に乗っている場合はスワイプを無効にして終了
-          startX = startY = null;
-          isHorizontal = false;
-          return;
-        }
       } else {
         return;
       }
     }
 
+    // 横スワイプの場合は子要素のタップ判定を無視してスライドさせる
     if (isHorizontal) {
       e.preventDefault();
       track.style.transform = `translateX(${startTranslate + dx}px)`;
@@ -482,15 +475,17 @@ function enableSwipe() {
 
     track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
 
-    if (!isHorizontal) {
+    const dx = (e.changedTouches && e.changedTouches[0])
+      ? (e.changedTouches[0].clientX - startX)
+      : 0;
+
+    if (!isHorizontal || Math.abs(dx) < moveThreshold) {
+      // スワイプ距離が短い場合は元のタブに戻す
       moveToTab(order[activeIndex]);
     } else {
-      const dx = (e.changedTouches && e.changedTouches[0])
-        ? (e.changedTouches[0].clientX - startX)
-        : 0;
-      const threshold = 60;
-      if (dx < -threshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
-      else if (dx > threshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
+      // スワイプ距離が十分なら次/前のタブへ
+      if (dx < 0 && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
+      else if (dx > 0 && activeIndex > 0) moveToTab(order[activeIndex - 1]);
       else moveToTab(order[activeIndex]);
     }
 
@@ -502,6 +497,7 @@ function enableSwipe() {
   track.addEventListener('touchend', finishTouch, { passive: true });
   track.addEventListener('touchcancel', finishTouch, { passive: true });
 }
+
 
 
 
