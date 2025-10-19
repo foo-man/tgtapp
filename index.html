@@ -12,10 +12,10 @@
   --accent-1:#66c08a;
   --accent-2:#4aa36a;
   --muted:#6b806f;
-  --card-shadow: 0 8px 20px rgba(32,50,40,0.07);
+  --card-shadow: 0 10px 30px rgba(32,50,40,0.08);
 }
 
-/* seasonal theme overrides */
+/* seasonal theme */
 body[data-theme="spring"]{ --accent-1:#82d89a; --accent-2:#5bc07a; --bg-1:#f0fbf6; --muted:#5b7b63; }
 body[data-theme="summer"]{ --accent-1:#3fc1ff; --accent-2:#1ea8f0; --bg-1:#eaf8ff; --muted:#3b6b76; }
 body[data-theme="autumn"]{ --accent-1:#f29a5b; --accent-2:#e16c3b; --bg-1:#fff6f0; --muted:#6b4b36; }
@@ -28,67 +28,62 @@ body{
   background: linear-gradient(180deg,var(--bg-1) 0%, var(--bg-2) 100%);
   color:#24362b; margin:0; padding:1rem; -webkit-font-smoothing:antialiased;
 }
-.container{max-width:980px;margin:0 auto;padding-bottom:4rem}
+
+/* layout */
+.container{max-width:980px;margin:0 auto;padding-bottom:3rem}
 .appbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:12px;margin-bottom:12px;background:linear-gradient(180deg,#fff,#fbfffb);box-shadow:var(--card-shadow)}
 .app-title{display:flex;align-items:center;gap:10px}
-.app-title h1{font-size:1.1rem;margin:0;color:var(--accent-2)}
+.app-title h1{font-size:1.05rem;margin:0;color:var(--accent-2)}
 .stats{display:flex;gap:12px;align-items:center;color:var(--muted);font-size:0.9rem}
 
-/* common UI */
-.card{
-  background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98));
-  border-radius:14px;padding:12px;box-shadow:var(--card-shadow);margin:12px 0;
-}
-.input{width:100%;padding:10px;border-radius:12px;border:1px solid #e6efe6;background:#fbfffb;font-size:0.95rem}
-.textarea{width:100%;padding:10px;border-radius:12px;border:1px solid #e6efe6;background:#fbfffb;height:72px;resize:none}
-.btn-primary{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;border:none;padding:10px 14px;border-radius:12px;cursor:pointer}
-.small-btn{background:transparent;border:1px solid rgba(36,54,43,0.06);padding:8px 10px;border-radius:10px;cursor:pointer}
+/* card */
+.card{background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,255,255,0.98));border-radius:14px;padding:12px;box-shadow:var(--card-shadow);margin:0}
 
-/* tabs */
-.tab-nav{display:flex;gap:8px;margin-bottom:12px}
-.tab-btn{flex:1;padding:10px 12px;border-radius:12px;border:1px solid transparent;background:#fff;cursor:pointer;font-weight:700;color:var(--muted);user-select:none}
-.tab-btn.active{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:#fff;box-shadow:0 6px 18px rgba(74,163,106,0.12)}
-
-/* panes container: クリッピングとスライド用 */
-.panes {
-  position: relative;
-  overflow: hidden;
-  isolation: isolate;
-  z-index: 0;
+/* tabs top */
+.tab-nav { display:flex; gap:8px; margin-bottom:12px; }
+.tab-btn {
+  flex:1;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid transparent;
+  background:#fff;
+  cursor:pointer;
+  font-weight:700;
+  color:var(--muted);
+  text-align:center;
 }
+.tab-btn.active { background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:#fff; box-shadow:0 6px 18px rgba(74,163,106,0.12); }
+
+/* panes */
+.panes { position:relative; overflow:hidden; isolation:isolate; margin-top:0; }
 .panes-track {
   display:flex;
+  width:auto; /* auto so children size controls layout */
   transition: transform .36s cubic-bezier(.2,.9,.2,1);
   will-change: transform;
-  backface-visibility: hidden;
-  transform-style: preserve-3d;
-  /* track幅は自動（flex children） */
+  touch-action: pan-y;
 }
-
-/* 各タブ幅はコンテナ幅と同じ（横に並ぶ） */
 .tab-pane {
   flex: 0 0 100%;
   padding: 12px 0 0 0;
   min-height: 120px;
+  box-sizing: border-box;
   position: relative;
-  z-index: 1;
 }
 
-/* 非アクティブパネルのカードからシャドウを消す（アニメーションつき） */
-.tab-pane .card {
-  box-shadow: none;
-  transition: box-shadow .24s ease, transform .18s ease;
-}
+/* card shadow only for active pane (no overflow showing from neighbors) */
+.tab-pane .card { box-shadow: none; transition: box-shadow .22s ease, transform .18s ease; }
+.tab-pane.pane-active .card { box-shadow: var(--card-shadow); transform: translateZ(0); }
 
-/* 表示中のパネルだけシャドウを戻す */
-.tab-pane.active .card {
-  box-shadow: var(--card-shadow);
-  transform: translateZ(0); /* 描画を安定させる */
-}
-
+/* force inputs and grids to not overflow */
+.good-grid { display:flex; flex-direction:column; gap:8px; width:100%; max-width:100%; }
+.input{width:100%;max-width:100%;padding:10px;border-radius:12px;border:1px solid #e6efe6;background:#fbfffb;font-size:0.95rem}
+.textarea{width:100%;max-width:100%;padding:10px;border-radius:12px;border:1px solid #e6efe6;background:#fbfffb;height:72px;resize:none}
+.btn-primary{background:linear-gradient(90deg,var(--accent-1),var(--accent-2));color:white;border:none;padding:10px 14px;border-radius:12px;cursor:pointer}
+.small-btn{background:transparent;border:1px solid rgba(36,54,43,0.06);padding:8px 10px;border-radius:10px;cursor:pointer}
 
 /* calendar */
-.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.calendar-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;width:100%;box-sizing:border-box}
 .calendar-weekday{font-size:0.85rem;text-align:center;color:#7c947f;padding:6px 0;font-weight:700}
 .calendar-cell{background:transparent;border-radius:10px;padding:8px 6px;min-height:64px;display:flex;align-items:flex-start;flex-direction:column;position:relative;border:1px solid transparent;cursor:pointer;transition:transform .12s ease,box-shadow .12s ease}
 .calendar-cell:focus{outline:none;box-shadow:0 6px 20px rgba(36,54,43,0.06);transform:translateY(-4px)}
@@ -97,7 +92,7 @@ body{
 .calendar-cell.has-entry{background:linear-gradient(180deg,#f9fffa,#ffffff);border:1px solid rgba(80,160,110,0.06)}
 
 /* history list */
-.history-list{max-height:60vh;overflow:auto;padding-right:6px}
+.history-list{max-height:56vh;overflow:auto;padding-right:6px}
 .history-card{background:transparent;border-radius:12px;padding:10px;border:1px solid rgba(34,62,46,0.06);margin-bottom:8px}
 .history-card h3{margin:0 0 6px 0;font-size:0.95rem}
 .history-card ul{padding:0;margin:0;list-style:none}
@@ -119,41 +114,16 @@ body{
 .snackbar.show{visibility:visible;opacity:1}
 .no-history{display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--muted);padding:12px}
 
+/* responsive tweaks */
 @media (max-width:720px){
-  .calendar-grid{grid-template-columns:repeat(7,1fr)}
-  .history-card{padding:8px}
+  .history-list{max-height:45vh}
+  .input,.textarea{font-size:1rem;padding:12px}
 }
-
-/* good-grid の基本（デスクトップ/タブレットでは3列） */
-.good-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-
-/* モバイルでは縦並びにする */
-@media (max-width: 720px) {
-  .good-grid {
-    grid-template-columns: 1fr; /* 1列 */
-  }
-
-  /* 日付フィールドや行全体のレイアウトが横並びで崩れる場合に備えて */
-  /* 今日タブのトップ行を縦並びにする（必要なら有効） */
-  #tab-today .card > div[style] { /* inline styleが残っている場合のフォールバック */
-    flex-direction: column;
-  }
-
-  /* 余白をちょっと増やして入力しやすくする */
-  .input, .textarea {
-    font-size: 1rem;
-  }
-}
-
 </style>
 </head>
 <body>
 <div class="container">
-  <div class="appbar" role="banner">
+  <header class="appbar" role="banner">
     <div class="app-title">
       <div style="font-size:1.6rem">🍀</div>
       <div>
@@ -164,36 +134,33 @@ body{
         </div>
       </div>
     </div>
-
     <div style="display:flex;align-items:center;gap:8px">
       <button id="themeToggle" class="small-btn" aria-label="テーマ切替">🌸</button>
     </div>
-  </div>
+  </header>
 
   <!-- tabs -->
-  <div class="tab-nav" role="tablist" aria-label="メインタブ">
+  <nav class="tab-nav" role="tablist" aria-label="メインタブ">
     <button class="tab-btn active" role="tab" aria-selected="true" data-tab="today">🌿 今日</button>
     <button class="tab-btn" role="tab" data-tab="calendar">📅 カレンダー</button>
     <button class="tab-btn" role="tab" data-tab="history">📖 履歴</button>
-  </div>
+  </nav>
 
   <!-- panes -->
   <div class="panes" id="panes" aria-live="polite">
     <div class="panes-track" id="panesTrack">
-      <div id="tab-today" class="tab-pane">
+      <!-- today pane -->
+      <section id="tab-today" class="tab-pane pane-active" role="tabpanel">
         <div class="card">
-          <div style="display:flex;gap:12px;align-items:flex-end">
-            <div style="flex:0 0 200px">
-              <label for="entryDateInput" style="display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px">日付</label>
-              <input type="date" id="entryDateInput" class="input" />
-            </div>
-            <div style="flex:1">
-              <div class="good-grid">
-  <input id="good1" placeholder="いいこと①" class="input" />
-  <input id="good2" placeholder="いいこと②" class="input" />
-  <input id="good3" placeholder="いいこと③" class="input" />
-</div>
-            </div>
+          <div style="margin-bottom:10px">
+            <label for="entryDateInput" style="display:block;font-size:0.85rem;color:var(--muted);margin-bottom:6px">日付</label>
+            <input type="date" id="entryDateInput" class="input" />
+          </div>
+
+          <div class="good-grid">
+            <input id="good1" placeholder="いいこと①" class="input" />
+            <input id="good2" placeholder="いいこと②" class="input" />
+            <input id="good3" placeholder="いいこと③" class="input" />
           </div>
 
           <textarea id="comment" class="textarea" placeholder="今日のひとことメモ" style="margin-top:12px"></textarea>
@@ -205,9 +172,10 @@ body{
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
-      <div id="tab-calendar" class="tab-pane">
+      <!-- calendar pane -->
+      <section id="tab-calendar" class="tab-pane" role="tabpanel">
         <div class="card">
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
             <div id="calendarTitle" style="font-weight:700;color:var(--muted)"></div>
@@ -222,14 +190,15 @@ body{
           <div style="margin-top:12px;font-weight:700;color:var(--muted)">最近の記録</div>
           <div id="recentList" class="history-list" style="padding:10px;margin-top:6px"></div>
         </div>
-      </div>
+      </section>
 
-      <div id="tab-history" class="tab-pane">
+      <!-- history pane -->
+      <section id="tab-history" class="tab-pane" role="tabpanel">
         <div class="card">
           <div style="font-weight:700;color:var(--muted);margin-bottom:8px">すべての履歴</div>
           <div id="historyListView" class="history-list" style="padding:10px"></div>
         </div>
-      </div>
+      </section>
     </div>
   </div>
 </div>
@@ -258,8 +227,9 @@ body{
 /* ---------- state ---------- */
 let selectedDate = new Date();
 let modalDate = new Date();
-let lastActive = 'today';
 let currentTheme = localStorage.getItem('theme') || 'spring';
+const order = ['today','calendar','history'];
+let activeIndex = 0; // track current index for easier management
 
 /* ---------- helpers ---------- */
 function pad(n){ return n < 10 ? '0' + n : ''+n; }
@@ -275,7 +245,7 @@ function applyTheme(t){
   const btn = document.getElementById('themeToggle');
   if(btn) btn.textContent = icons[t] || '🌸';
 }
-function cycleTheme(){ const order=['spring','summer','autumn','winter']; let i=order.indexOf(currentTheme); i=(i+1)%order.length; applyTheme(order[i]); showSnackbar('テーマ: '+order[i]); }
+function cycleTheme(){ const orderT=['spring','summer','autumn','winter']; let i=orderT.indexOf(currentTheme); i=(i+1)%orderT.length; applyTheme(orderT[i]); showSnackbar('テーマ: '+orderT[i]); }
 
 /* ---------- stats ---------- */
 function updateStats(){
@@ -284,14 +254,14 @@ function updateStats(){
   keys.forEach(k=>{
     try{ const d=JSON.parse(localStorage.getItem(k)); if(!d||!d.goodThings) return; d.goodThings.forEach(x=>{ if(x && x.trim()) total++; }); }catch(e){}
   });
-  document.getElementById('total').textContent = '総いいこと: ' + total;
+  const tot = document.getElementById('total'); if(tot) tot.textContent = '総いいこと: ' + total;
 
   let streak=0; let cur=new Date();
   while(true){
     const k=formatDate(cur);
     if(localStorage.getItem(k)){ streak++; cur.setDate(cur.getDate()-1); } else break;
   }
-  document.getElementById('streak').textContent = '連続: ' + streak + '日';
+  const st = document.getElementById('streak'); if(st) st.textContent = '連続: ' + streak + '日';
 }
 
 /* ---------- save ---------- */
@@ -314,10 +284,11 @@ function saveGoodThings(){
 
 /* ---------- calendar ---------- */
 function renderCalendar(){
-  const grid=document.getElementById('calendarGrid'); grid.innerHTML='';
+  const grid=document.getElementById('calendarGrid'); if(!grid) return; grid.innerHTML='';
   const year=selectedDate.getFullYear(), month=selectedDate.getMonth();
   const firstDay = new Date(year,month,1), lastDay=new Date(year,month+1,0);
-  const weekdays=['日','月','火','水','木','金','土']; weekdays.forEach(w=>{ const el=document.createElement('div'); el.className='calendar-weekday'; el.textContent=w; grid.appendChild(el); });
+  const weekdays=['日','月','火','水','木','金','土'];
+  weekdays.forEach(w=>{ const el=document.createElement('div'); el.className='calendar-weekday'; el.textContent=w; grid.appendChild(el); });
 
   for(let i=0;i<firstDay.getDay();i++){ const empty=document.createElement('div'); empty.className='calendar-cell empty'; empty.setAttribute('aria-hidden','true'); grid.appendChild(empty); }
   for(let d=1; d<=lastDay.getDate(); d++){
@@ -329,10 +300,10 @@ function renderCalendar(){
     cell.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); showHistoryModal(date); }});
     grid.appendChild(cell);
   }
-  document.getElementById('calendarTitle').textContent = `${year}年 ${month+1}月`;
+  const title = document.getElementById('calendarTitle'); if(title) title.textContent = `${year}年 ${month+1}月`;
 }
 
-/* ---------- history list builders ---------- */
+/* ---------- history card ---------- */
 function buildHistoryCard(key, data){
   const card=document.createElement('div'); card.className='history-card';
   const h=document.createElement('h3'); h.textContent=key; card.appendChild(h);
@@ -380,8 +351,9 @@ function buildHistoryCard(key, data){
   return card;
 }
 
+/* ---------- render lists ---------- */
 function renderRecentList(){
-  const container=document.getElementById('recentList'); container.innerHTML='';
+  const container=document.getElementById('recentList'); if(!container) return; container.innerHTML='';
   const keys=Object.keys(localStorage).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse().slice(0,12);
   if(keys.length===0){ container.innerHTML='<div class="no-history">まだ履歴がありません。</div>'; return; }
   keys.forEach(k=>{
@@ -390,7 +362,7 @@ function renderRecentList(){
 }
 
 function renderHistoryList(){
-  const container=document.getElementById('historyListView'); container.innerHTML='';
+  const container=document.getElementById('historyListView'); if(!container) return; container.innerHTML='';
   const keys=Object.keys(localStorage).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse();
   if(keys.length===0){ container.innerHTML='<div class="no-history">まだ履歴がありません。</div>'; return; }
   keys.forEach(k=>{
@@ -413,7 +385,7 @@ function closeModal(){ const modal=document.getElementById('historyModal'); moda
 /* seasonal effect */
 function createSeasonalEffect(){
   const map={spring:'🌸', summer:'🌊', autumn:'🍂', winter:'❄️'}; const emoji = map[currentTheme]||'🌸';
-  for(let i=0;i<10;i++){
+  for(let i=0;i<8;i++){
     const el=document.createElement('div'); el.textContent=emoji; el.style.position='fixed'; el.style.left=(6+Math.random()*88)+'%'; el.style.top='-2rem';
     el.style.fontSize=(12+Math.random()*28)+'px'; el.style.pointerEvents='none'; el.style.zIndex=1500; el.style.transition='transform 3s linear, opacity 3s linear';
     document.body.appendChild(el);
@@ -422,50 +394,34 @@ function createSeasonalEffect(){
   }
 }
 
-/* ---------- tab logic: use px translate (fix for hidden/visible issues) ---------- */
-const order = ['today','calendar','history'];
-function indexOfTab(name){ return order.indexOf(name); }
-
+/* ---------- slide & swipe (px-based, stable) ---------- */
 function moveToTab(name, animate=true){
-  const idx = indexOfTab(name);
+  const idx = order.indexOf(name);
   if(idx < 0) return;
   const track = document.getElementById('panesTrack');
   const container = document.getElementById('panes');
   const cw = container.clientWidth;
+
   if(!animate) track.style.transition = 'none';
   else track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
+
   track.style.transform = `translateX(-${idx * cw}px)`;
+  activeIndex = idx;
 
-  // タブボタン更新
-  document.querySelectorAll('.tab-btn').forEach(b=>{ const is = b.dataset.tab === name; b.classList.toggle('active', is); b.setAttribute('aria-selected', is? 'true':'false'); });
+  // active button
+  document.querySelectorAll('.tab-btn').forEach(b=>{ const is=b.dataset.tab===name; b.classList.toggle('active', is); b.setAttribute('aria-selected', is? 'true':'false'); });
 
-  // ここで各パネルに active をつける（シャドウ表示の切替用）
-  document.querySelectorAll('.tab-pane').forEach(p => {
-    p.classList.toggle('active', p.id === 'tab-' + name);
-  });
-
-  lastActive = name;
+  // pane-active class
+  document.querySelectorAll('.tab-pane').forEach((p,i) => p.classList.toggle('pane-active', i === idx) );
 
   if(name === 'calendar'){ renderCalendar(); renderRecentList(); }
   if(name === 'history'){ renderHistoryList(); }
-  adjustPanesHeight();
+
+  // restore transition shortly if disabled
+  if(!animate) setTimeout(()=>{ track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)'; }, 40);
 }
 
-
-function adjustPanesHeight(){
-  const panes = document.getElementById('panes');
-  const idx = indexOfTab(lastActive);
-  const panesTrack = document.getElementById('panesTrack');
-  const pane = panesTrack.children[idx];
-  if(!pane) return;
-  const inner = pane.querySelector('.card') || pane;
-  const height = inner.offsetHeight + 24; // buffer
-  panes.style.height = panes.offsetHeight + 'px';
-  requestAnimationFrame(()=>{ panes.style.transition = 'height .32s cubic-bezier(.2,.9,.2,1)'; panes.style.height = height + 'px'; });
-  setTimeout(()=>{ panes.style.transition=''; panes.style.height=''; }, 360);
-}
-
-/* swipe handling using px (more reliable) */
+/* swipe using px math */
 function enableSwipe(){
   const track = document.getElementById('panesTrack');
   const container = document.getElementById('panes');
@@ -476,8 +432,7 @@ function enableSwipe(){
   track.addEventListener('touchstart', (e)=>{
     if(e.touches.length > 1) return;
     startX = e.touches[0].clientX;
-    const idx = indexOfTab(lastActive);
-    startTranslate = - idx * container.clientWidth;
+    startTranslate = - activeIndex * container.clientWidth;
     dragging = true;
     track.style.transition = 'none';
   }, {passive:true});
@@ -494,33 +449,48 @@ function enableSwipe(){
     const dx = (e.changedTouches && e.changedTouches[0]) ? (e.changedTouches[0].clientX - startX) : 0;
     dragging = false; startX = null;
     const threshold = 60;
-    const idx = indexOfTab(lastActive);
-    if(dx < -threshold && idx < order.length - 1) moveToTab(order[idx+1]);
-    else if(dx > threshold && idx > 0) moveToTab(order[idx-1]);
-    else moveToTab(lastActive);
+    if(dx < -threshold && activeIndex < order.length -1) moveToTab(order[activeIndex+1]);
+    else if(dx > threshold && activeIndex > 0) moveToTab(order[activeIndex-1]);
+    else moveToTab(order[activeIndex]);
   });
 }
 
-/* ---------- UI init ---------- */
+/* ---------- init ---------- */
 window.addEventListener('DOMContentLoaded', ()=>{
   applyTheme(currentTheme);
   document.getElementById('entryDateInput').value = formatDate(new Date());
-  document.querySelectorAll('.tab-btn').forEach(btn => btn.addEventListener('click', ()=> moveToTab(btn.dataset.tab)));
-  moveToTab('today', false); // initial (no animation)
+
+  // tab buttons
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.addEventListener('click', ()=> moveToTab(btn.dataset.tab));
+  });
+
+  // initial setup - position using px
+  moveToTab('today', false);
   enableSwipe();
+
+  // save & nav
   document.getElementById('saveBtn').addEventListener('click', saveGoodThings);
   document.getElementById('prevMonthBtn').addEventListener('click', ()=>{ selectedDate.setMonth(selectedDate.getMonth()-1); renderCalendar(); });
   document.getElementById('nextMonthBtn').addEventListener('click', ()=>{ selectedDate.setMonth(selectedDate.getMonth()+1); renderCalendar(); });
+
+  // modal controls
   document.getElementById('closeModalBtn').addEventListener('click', closeModal);
   document.querySelector('#historyModal .modal-backdrop').addEventListener('click', closeModal);
   document.getElementById('prevDayBtn').addEventListener('click', ()=>{ modalDate.setDate(modalDate.getDate()-1); showHistoryModal(modalDate); });
   document.getElementById('nextDayBtn').addEventListener('click', ()=>{ modalDate.setDate(modalDate.getDate()+1); showHistoryModal(modalDate); });
+
+  // theme toggle
   document.getElementById('themeToggle').addEventListener('click', cycleTheme);
+
+  // keyboard: Esc closes modal
   window.addEventListener('keydown', (e)=>{ if(e.key === 'Escape'){ const modal=document.getElementById('historyModal'); if(modal.classList.contains('show')) closeModal(); } });
 
+  // initial render
   renderCalendar(); renderRecentList(); renderHistoryList(); updateStats();
-  setTimeout(()=> adjustPanesHeight(), 80);
-  window.addEventListener('resize', ()=>{ moveToTab(lastActive, false); adjustPanesHeight(); });
+
+  // on resize, reposition slider to exact pixel location
+  window.addEventListener('resize', ()=>{ moveToTab(order[activeIndex], false); });
 });
 </script>
 </body>
