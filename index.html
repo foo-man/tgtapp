@@ -437,7 +437,7 @@ function enableSwipe() {
   const track = document.getElementById('panesTrack');
   let startX = 0, startY = 0;
   let currentTranslate = 0;
-  let isSwiping = false;
+  let isSwiping = null; // null=未判定, true=横, false=縦
   let moved = false;
 
   const swipeThreshold = 12; // 横スワイプ判定
@@ -447,13 +447,13 @@ function enableSwipe() {
   container.addEventListener('touchstart', e => {
     if (e.touches.length > 1) return;
 
-    // カレンダーや縦スクロールリスト上ではスワイプ無効
+    // カレンダーや履歴リスト上ではスワイプ無効
     if(e.target.closest('.calendar-grid, .history-list')) return;
 
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     currentTranslate = -activeIndex * container.clientWidth;
-    isSwiping = false;
+    isSwiping = null;
     moved = false;
     track.style.transition = 'none';
   });
@@ -464,18 +464,10 @@ function enableSwipe() {
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
 
-    if (!isSwiping) {
-      // 縦方向の動きが大きい場合は横スワイプキャンセル
-      if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
-        isSwiping = false;
-        moved = false;
-        return;
-      }
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) {
-        isSwiping = true;
-      } else {
-        return;
-      }
+    if (isSwiping === null) {
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) isSwiping = true;
+      else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 8) isSwiping = false;
+      else return;
     }
 
     if (isSwiping) {
@@ -501,12 +493,13 @@ function enableSwipe() {
     }
 
     startX = startY = 0;
-    isSwiping = false;
+    isSwiping = null;
     moved = false;
   });
 
   container.addEventListener('touchcancel', () => moveToTab(order[activeIndex]));
 }
+
 
 
 
