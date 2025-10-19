@@ -429,73 +429,65 @@ function moveToTab(name, animate=true){
 function enableSwipe() {
   const track = document.getElementById('panesTrack');
   const container = document.getElementById('panes');
-  let startX = null, startY = null;
-  let startTranslate = 0;
-  let isHorizontal = null;
-  let moved = false;
-
-  const swipeThreshold = 4; // 横スワイプ判定の敏感度
-  const moveThreshold = 40; // 実際にスライド切り替えする距離
+  let startX = 0, startY = 0;
+  let currentTranslate = 0;
+  let isSwiping = false;
+  let active = false;
 
   track.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) return;
-
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
-    startTranslate = -activeIndex * container.clientWidth;
-    isHorizontal = null;
-    moved = false;
+    currentTranslate = -activeIndex * container.clientWidth;
+    isSwiping = false;
+    active = true;
     track.style.transition = 'none';
   }, { passive: true });
 
   track.addEventListener('touchmove', (e) => {
-    if (startX === null || startY === null) return;
-
+    if (!active) return;
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
 
-    if (isHorizontal === null) {
-      if (Math.abs(dx) > swipeThreshold || Math.abs(dy) > swipeThreshold) {
-        isHorizontal = Math.abs(dx) > Math.abs(dy);
+    // 方向判定: 横スワイプ優先
+    if (!isSwiping) {
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 5) {
+        isSwiping = true;
+      } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 5) {
+        // 縦スクロールならスワイプ無効
+        active = false;
+        return;
       } else {
         return;
       }
     }
 
-    // 横スワイプの場合は子要素のタップ判定を無視してスライドさせる
-    if (isHorizontal) {
-      e.preventDefault();
-      track.style.transform = `translateX(${startTranslate + dx}px)`;
-      moved = true;
+    if (isSwiping) {
+      e.preventDefault(); // 横スワイプ優先
+      track.style.transform = `translateX(${currentTranslate + dx}px)`;
     }
   }, { passive: false });
 
-  function finishTouch(e) {
-    if (startX === null) return;
-
+  track.addEventListener('touchend', (e) => {
+    if (!active) return;
     track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
+    const dx = (e.changedTouches && e.changedTouches[0]) ? e.changedTouches[0].clientX - startX : 0;
+    const threshold = container.clientWidth * 0.25; // タブ切り替えは25%移動でOK
 
-    const dx = (e.changedTouches && e.changedTouches[0])
-      ? (e.changedTouches[0].clientX - startX)
-      : 0;
+    if (dx < -threshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
+    else if (dx > threshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
+    else moveToTab(order[activeIndex]);
 
-    if (!isHorizontal || Math.abs(dx) < moveThreshold) {
-      // スワイプ距離が短い場合は元のタブに戻す
-      moveToTab(order[activeIndex]);
-    } else {
-      // スワイプ距離が十分なら次/前のタブへ
-      if (dx < 0 && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
-      else if (dx > 0 && activeIndex > 0) moveToTab(order[activeIndex - 1]);
-      else moveToTab(order[activeIndex]);
-    }
+    active = false;
+    isSwiping = false;
+  });
 
-    startX = startY = null;
-    isHorizontal = null;
-    moved = false;
-  }
-
-  track.addEventListener('touchend', finishTouch, { passive: true });
-  track.addEventListener('touchcancel', finishTouch, { passive: true });
+  track.addEventListener('touchcancel', () => {
+    track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
+    moveToTab(order[activeIndex]);
+    active = false;
+    isSwiping = false;
+  });
 }
 
 
