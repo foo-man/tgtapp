@@ -7,14 +7,14 @@
   "theme_color": "#86cfa3",
   "icons": [
     {
-      "src": "kuro-ba-icon.png",
+      "src": "kuro-ba-icon.jpg",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/jpg"
     },
     {
-      "src": "kuro-ba-icon.png",
+      "src": "kuro-ba-icon.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpg"
     }
   ]
 }
