@@ -81,9 +81,12 @@ body{
 
 /* 小さな修正：日付入力の横伸びを抑える */
 #entryDateInput {
-  max-width: 180px; /* 任意の幅に調整可能 */
   width: auto;
-  display: inline-block;
+  max-width: 180px;
+  min-width: 0;
+  -webkit-appearance: none; /* iOS独自UIを少し抑制 */
+  appearance: none;
+  flex-shrink: 1;
 }
 
 /* card shadow only for active pane */
