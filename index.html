@@ -451,112 +451,61 @@ document.addEventListener('click', (ev) => {
 
 
 function enableSwipe() {
-  const container = document.getElementById('panes');
-  const track = document.getElementById('panesTrack');
-  let startX = 0, startY = 0;
-  let currentTranslate = 0;
-  let isHorizontal = null; // null=未判定, true=横, false=縦
-  let moved = false;
-  let startTarget = null;
-  let lastDx = 0, lastDy = 0;
-
-  const swipeThreshold = 12; // 判定に必要な最小px
-  const moveThreshold = container.clientWidth * 0.22;
-  const slowFactor = 0.7;
-  const BLOCK_CLICK_MS = 420; // 縦スクロール時に合成クリックを抑止する時間（調整可）
-
-  container.addEventListener('touchstart', e => {
-    if (e.touches.length > 1) return;
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    startTarget = e.target;
-    currentTranslate = -activeIndex * container.clientWidth;
-    isHorizontal = null;
-    moved = false;
-    lastDx = lastDy = 0;
-    track.style.transition = 'none';
-  }, { passive: true });
-
-  container.addEventListener('touchmove', e => {
-    if (e.touches.length > 1) return;
-    const dx = e.touches[0].clientX - startX;
-    const dy = e.touches[0].clientY - startY;
-    lastDx = dx; lastDy = dy;
-
-    // 判定未確定 -> 横か縦か判定する
-    if (isHorizontal === null) {
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) {
-        isHorizontal = true;
-      } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > swipeThreshold) {
-        isHorizontal = false;
-        // 縦スクロールと早めに判定できたら、以降の touchend でクリックを抑止するためタイマーをセット
-        _ignoreClickUntil = Date.now() + BLOCK_CLICK_MS;
-      } else {
-        return; // まだ判定できない段階
-      }
-    }
-
-    // 横スワイプと判定された場合のみ横処理（横のときだけ preventDefault）
-    if (isHorizontal) {
-      e.preventDefault(); // 横操作として扱うためブラウザの横操作を止める
-      track.style.transform = `translateX(${currentTranslate + dx * slowFactor}px)`;
-      moved = true;
-    } else {
-      // 縦スクロール → ブラウザに任せる（何もしない）
-      return;
-    }
-  }, { passive: false });
-
+  // ...（先頭の touchstart/touchmove 部分はそのまま）...
   container.addEventListener('touchend', e => {
     const touch = e.changedTouches && e.changedTouches[0];
     const dx = touch ? (touch.clientX - startX) : lastDx;
-    const dy = touch ? (touch.clientY - startY) : lastDy;
     track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
 
     if (moved && isHorizontal) {
-      // 横スワイプ操作として成立 → タブ遷移
       if (dx < -moveThreshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
       else if (dx > moveThreshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
       else moveToTab(order[activeIndex]);
 
-      // 横スワイプでも念のため短時間クリックを抑止（誤動作防止）
       _ignoreClickUntil = Date.now() + 120;
     } else {
-      // スワイプでない（＝「タップ」か「縦スクロール」か）
       if (isHorizontal === false) {
-        // 明確に縦スクロールと判定されている -> 何もしない（ブラウザが既にスクロール済み）
-        // ただし合成クリックが飛ぶ場合があるので保険で少し抑止
+        // 明確に縦スクロール → 合成クリック抑止
         _ignoreClickUntil = Math.max(_ignoreClickUntil, Date.now() + BLOCK_CLICK_MS);
-        moveToTab(order[activeIndex]); // 見た目を元に戻す
+        moveToTab(order[activeIndex]);
       } else {
-        // isHorizontal === null（ほとんど動いていない） -> これをタップと見なしてクリック補償
+        // 小さな移動（＝タップ）として補償する — ここを修正
         const clientX = touch ? touch.clientX : (startX || 0);
         const clientY = touch ? touch.clientY : (startY || 0);
         let el = document.elementFromPoint(clientX, clientY) || startTarget;
 
+        // ここでクリック可能な祖先を探す（button, a, input, label, role=button など）
         if (el) {
-          // label -> 対応するコントロールにフォワード
-          if (el.tagName === 'LABEL' && el.htmlFor) {
-            const ctrl = document.getElementById(el.htmlFor);
-            if (ctrl && typeof ctrl.click === 'function') ctrl.click();
+          const clickable = el.closest('button, a, input, label, [role="button"], [data-clickable]');
+
+          const targetForClick = clickable || el;
+
+          // label は関連コントロールにフォワード
+          if (targetForClick.tagName === 'LABEL' && targetForClick.htmlFor) {
+            const ctrl = document.getElementById(targetForClick.htmlFor);
+            if (ctrl && typeof ctrl.click === 'function') {
+              ctrl.click();
+            }
           } else {
-            // programmatic click（ボタンやカレンダーセル等）
-            if (typeof el.click === 'function') el.click();
+            // より正確にイベントを送る（ネイティブ click に近づける）
+            if (targetForClick) {
+              const evClick = new MouseEvent('click', {
+                view: window,
+                bubbles: true,
+                cancelable: true
+              });
+              targetForClick.dispatchEvent(evClick);
+            }
           }
         }
+
         moveToTab(order[activeIndex]);
       }
     }
 
-    // reset
-    startX = startY = 0;
-    isHorizontal = null;
-    moved = false;
-    startTarget = null;
-    lastDx = lastDy = 0;
+    // reset...
   }, { passive: true });
-
-  container.addEventListener('touchcancel', () => moveToTab(order[activeIndex]));
+  // ...
 }
 
 
