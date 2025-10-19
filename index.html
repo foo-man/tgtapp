@@ -440,73 +440,133 @@ function moveToTab(name, animate=true){
 
 // --- 合成クリック抑止（短時間） ---
 // touch による縦スクロール直後にブラウザが合成クリックを投げるのを防ぐ
+// ---- 合成クリック抑止の定義（グローバル） ----
 let _ignoreClickUntil = 0;
+const BLOCK_CLICK_MS = 350; // 合成クリックを抑止する時間（ms）
+
+// キャプチャ段階で短時間のクリックを阻止（スクロールやスワイプ直後の合成クリック対策）
 document.addEventListener('click', (ev) => {
   if (Date.now() < _ignoreClickUntil) {
     ev.stopImmediatePropagation();
     ev.preventDefault();
-    // ここで return すると、すべての短時間クリックを抑止します（必要最小限の期間）
   }
-}, true); // capture phase で先に止める
+}, true); // capture = true（先に止める）
 
-
+// ---- 改良版 enableSwipe（この関数で touchstart/touchmove/touchend を扱う） ----
 function enableSwipe() {
-  // ...（先頭の touchstart/touchmove 部分はそのまま）...
-  container.addEventListener('touchend', e => {
-    const touch = e.changedTouches && e.changedTouches[0];
-    const dx = touch ? (touch.clientX - startX) : lastDx;
+  const container = document.getElementById('panes');
+  const track = document.getElementById('panesTrack');
+  if (!container || !track) return;
+
+  let startX = 0, startY = 0;
+  let currentTranslate = 0;
+  let isHorizontal = null; // null=未判定, true=横, false=縦
+  let moved = false;
+  let startTarget = null;
+
+  const swipeThreshold = 12; // 判定開始に必要な最小px
+  const moveThreshold = container.clientWidth * 0.22;
+  const slowFactor = 0.7;
+
+  container.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) return;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startTarget = e.target;
+    currentTranslate = -activeIndex * container.clientWidth;
+    isHorizontal = null;
+    moved = false;
+    track.style.transition = 'none';
+  }, { passive: true });
+
+  container.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 1) return;
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+
+    // 判定未確定なら横/縦を判定
+    if (isHorizontal === null) {
+      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) {
+        isHorizontal = true;
+      } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > swipeThreshold) {
+        isHorizontal = false;
+      } else {
+        return; // まだ判断できない小さな動き
+      }
+    }
+
+    if (isHorizontal) {
+      // 横スワイプ扱いのときのみ preventDefault してブラウザ水平動作を止める
+      e.preventDefault();
+      track.style.transform = `translateX(${currentTranslate + dx * slowFactor}px)`;
+      moved = true;
+    } else {
+      // 縦スクロール判定 -> ブラウザに任せる
+      return;
+    }
+  }, { passive: false });
+
+  container.addEventListener('touchend', (e) => {
+    const touch = (e.changedTouches && e.changedTouches[0]) || null;
+    const dx = touch ? (touch.clientX - startX) : 0;
     track.style.transition = 'transform .36s cubic-bezier(.2,.9,.2,1)';
 
     if (moved && isHorizontal) {
+      // 実際にスワイプと判定された場合はタブ切替
       if (dx < -moveThreshold && activeIndex < order.length - 1) moveToTab(order[activeIndex + 1]);
       else if (dx > moveThreshold && activeIndex > 0) moveToTab(order[activeIndex - 1]);
       else moveToTab(order[activeIndex]);
 
-      _ignoreClickUntil = Date.now() + 120;
+      // スワイプ直後の合成クリックをブロック
+      _ignoreClickUntil = Date.now() + BLOCK_CLICK_MS;
     } else {
+      // スワイプではない（＝タップ or 縦スクロール）
+      // 縦スクロールと判定された場合は合成クリックを少し長めに抑止しておく
       if (isHorizontal === false) {
-        // 明確に縦スクロール → 合成クリック抑止
         _ignoreClickUntil = Math.max(_ignoreClickUntil, Date.now() + BLOCK_CLICK_MS);
         moveToTab(order[activeIndex]);
       } else {
-        // 小さな移動（＝タップ）として補償する — ここを修正
-        const clientX = touch ? touch.clientX : (startX || 0);
-        const clientY = touch ? touch.clientY : (startY || 0);
+        // 小さな移動 = タップとして補償する（elementFromPoint で正しい要素を取り、クリック可能な祖先を探す）
+        const clientX = touch ? touch.clientX : startX;
+        const clientY = touch ? touch.clientY : startY;
         let el = document.elementFromPoint(clientX, clientY) || startTarget;
 
-        // ここでクリック可能な祖先を探す（button, a, input, label, role=button など）
         if (el) {
-          const clickable = el.closest('button, a, input, label, [role="button"], [data-clickable]');
+          // クリック対象として適切な祖先を探す（button や role=button, a, input, label など）
+          const clickable = el.closest('button, a, input, label, [role="button"], [data-clickable]') || el;
 
-          const targetForClick = clickable || el;
-
-          // label は関連コントロールにフォワード
-          if (targetForClick.tagName === 'LABEL' && targetForClick.htmlFor) {
-            const ctrl = document.getElementById(targetForClick.htmlFor);
-            if (ctrl && typeof ctrl.click === 'function') {
-              ctrl.click();
-            }
-          } else {
-            // より正確にイベントを送る（ネイティブ click に近づける）
-            if (targetForClick) {
+          if (clickable) {
+            // label の場合は関連コントロールにフォワード
+            if (clickable.tagName === 'LABEL' && clickable.htmlFor) {
+              const ctrl = document.getElementById(clickable.htmlFor);
+              if (ctrl && typeof ctrl.click === 'function') ctrl.click();
+            } else {
+              // ネイティブの click イベントを模した MouseEvent を発火
               const evClick = new MouseEvent('click', {
                 view: window,
                 bubbles: true,
                 cancelable: true
               });
-              targetForClick.dispatchEvent(evClick);
+              clickable.dispatchEvent(evClick);
             }
+            // 自前で click を発火したので、後続のネイティブ合成クリックは抑止
+            _ignoreClickUntil = Date.now() + BLOCK_CLICK_MS;
           }
         }
-
         moveToTab(order[activeIndex]);
       }
     }
 
-    // reset...
+    // reset
+    startX = startY = 0;
+    isHorizontal = null;
+    moved = false;
+    startTarget = null;
   }, { passive: true });
-  // ...
+
+  container.addEventListener('touchcancel', () => moveToTab(order[activeIndex]));
 }
+
 
 
 
