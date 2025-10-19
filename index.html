@@ -447,7 +447,7 @@ function enableSwipe() {
   let moved = false;
   let startTarget = null;
 
-  const swipeThreshold = 12; // 判定開始に必要な最小pix
+  const swipeThreshold = 12; // 判定開始に必要な最小px
   const moveThreshold = container.clientWidth * 0.22;
   const slowFactor = 0.7;
 
@@ -467,7 +467,7 @@ function enableSwipe() {
     const dx = e.touches[0].clientX - startX;
     const dy = e.touches[0].clientY - startY;
 
-    // 判定未確定 → 横か縦か判定する
+    // 判定未確定 -> 横か縦か判定する
     if (isHorizontal === null) {
       if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) {
         isHorizontal = true;
@@ -505,15 +505,20 @@ function enableSwipe() {
       let el = document.elementFromPoint(clientX, clientY) || startTarget;
 
       if (el) {
-        // label -> 対応するコントロールにフォワード
-        if (el.tagName === 'LABEL' && el.htmlFor) {
-          const ctrl = document.getElementById(el.htmlFor);
-          if (ctrl && typeof ctrl.click === 'function') ctrl.click();
-        } else {
-          // programmatic click（ボタンやカレンダーセル等）
-          if (typeof el.click === 'function') el.click();
+        // クリックすべきインタラクティブ要素を先に探す（子要素が返ってきた場合のフォールバック）
+        const actionable = el.closest && el.closest('button, a, input, [role="button"], [role="link"], label') || el;
+
+        if (actionable) {
+          // label の場合は対応するコントロールにフォワード
+          if (actionable.tagName === 'LABEL' && actionable.htmlFor) {
+            const ctrl = document.getElementById(actionable.htmlFor);
+            if (ctrl && typeof ctrl.click === 'function') ctrl.click();
+          } else {
+            if (typeof actionable.click === 'function') actionable.click();
+          }
         }
       }
+
       // 常に現在のタブ位置に戻す
       moveToTab(order[activeIndex]);
     }
@@ -527,6 +532,7 @@ function enableSwipe() {
 
   container.addEventListener('touchcancel', () => moveToTab(order[activeIndex]));
 }
+
 
 
 /* ---------- init ---------- */
