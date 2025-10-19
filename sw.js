@@ -1,5 +1,5 @@
 // sw.js — 改良版
-const CACHE_NAME = "good-things-cache-v3"; // バージョンをあげてデプロイしてください
+const CACHE_NAME = "good-things-cache-v4"; // バージョンをあげてデプロイしてください
 const OFFLINE_FALLBACK = "/index.html"; // ナビゲーションフォールバック（サイトルートに合わせて変更）
 const urlsToCache = [
   "./",
