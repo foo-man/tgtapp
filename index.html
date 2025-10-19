@@ -444,10 +444,15 @@ const BLOCK_CLICK_MS = 350; // 合成クリックを抑止する時間（ms）
 
 document.addEventListener('click', (ev) => {
   if (Date.now() < _ignoreClickUntil) {
-    ev.stopImmediatePropagation();
-    ev.preventDefault();
+    // インタラクティブ要素は許可する（編集ボタン等を通す）
+    const interactive = ev.target.closest('button, a, input, textarea, select, [role="button"], [data-clickable]');
+    if (!interactive) {
+      ev.stopImmediatePropagation();
+      ev.preventDefault();
+    }
   }
-}, true); // capture = true（先に止める）
+}, true);
+
 
 // ---- 改良版 enableSwipe（この関数で touchstart/touchmove/touchend を扱う） ----
 function enableSwipe() {
