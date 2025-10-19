@@ -123,6 +123,32 @@ body{
   .calendar-grid{grid-template-columns:repeat(7,1fr)}
   .history-card{padding:8px}
 }
+
+/* good-grid の基本（デスクトップ/タブレットでは3列） */
+.good-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+/* モバイルでは縦並びにする */
+@media (max-width: 720px) {
+  .good-grid {
+    grid-template-columns: 1fr; /* 1列 */
+  }
+
+  /* 日付フィールドや行全体のレイアウトが横並びで崩れる場合に備えて */
+  /* 今日タブのトップ行を縦並びにする（必要なら有効） */
+  #tab-today .card > div[style] { /* inline styleが残っている場合のフォールバック */
+    flex-direction: column;
+  }
+
+  /* 余白をちょっと増やして入力しやすくする */
+  .input, .textarea {
+    font-size: 1rem;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -162,11 +188,11 @@ body{
               <input type="date" id="entryDateInput" class="input" />
             </div>
             <div style="flex:1">
-              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
-                <input id="good1" placeholder="いいこと①" class="input" />
-                <input id="good2" placeholder="いいこと②" class="input" />
-                <input id="good3" placeholder="いいこと③" class="input" />
-              </div>
+              <div class="good-grid">
+  <input id="good1" placeholder="いいこと①" class="input" />
+  <input id="good2" placeholder="いいこと②" class="input" />
+  <input id="good3" placeholder="いいこと③" class="input" />
+</div>
             </div>
           </div>
 
