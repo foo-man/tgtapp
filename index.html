@@ -442,16 +442,22 @@ function moveToTab(name, animate=true){
 let _ignoreClickUntil = 0;
 const BLOCK_CLICK_MS = 350; // 合成クリックを抑止する時間（ms）
 
+let ignoredElement = null;
+
+function suppressNextClickOn(el) {
+  ignoredElement = el;
+  _ignoreClickUntil = Date.now() + BLOCK_CLICK_MS;
+}
+
 document.addEventListener('click', (ev) => {
-  if (Date.now() < _ignoreClickUntil) {
-    // インタラクティブ要素は許可する（編集ボタン等を通す）
-    const interactive = ev.target.closest('button, a, input, textarea, select, [role="button"], [data-clickable]');
-    if (!interactive) {
+  if (Date.now() < _ignoreClickUntil && ignoredElement) {
+    if (ev.target === ignoredElement || ignoredElement.contains(ev.target)) {
       ev.stopImmediatePropagation();
       ev.preventDefault();
     }
   }
 }, true);
+
 
 
 // ---- 改良版 enableSwipe（この関数で touchstart/touchmove/touchend を扱う） ----
@@ -544,6 +550,8 @@ function enableSwipe() {
               if (ctrl && typeof ctrl.click === 'function') ctrl.click();
             } else {
               // ネイティブの click イベントを模した MouseEvent を発火
+              suppressNextClickOn(clickable);
+              clickable.click();
               const evClick = new MouseEvent('click', {
                 view: window,
                 bubbles: true,
