@@ -452,41 +452,33 @@ function enableSwipe() {
   const moveThreshold = container.clientWidth * 0.25;
   const slowFactor = 0.7;
 
-  container.addEventListener('touchstart', e => {
-    if (e.touches.length > 1) return;
-
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-    currentTranslate = -activeIndex * container.clientWidth;
-    isSwiping = false;
-    moved = false;
-    track.style.transition = 'none';
-  });
-
   container.addEventListener('touchmove', e => {
-    const dx = e.touches[0].clientX - startX;
-    const dy = e.touches[0].clientY - startY;
+  if (e.touches.length > 1) return; // マルチタッチ無視
+  const dx = e.touches[0].clientX - startX;
+  const dy = e.touches[0].clientY - startY;
 
-    if (!isSwiping) {
-      // 縦スクロール動作を阻害しないように、縦方向が大きい場合は横スワイプキャンセル
-      if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
-        isSwiping = false;
-        moved = false;
-        return;
-      }
-      if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) {
-        isSwiping = true;
-      } else {
-        return;
-      }
+  if (!isSwiping) {
+    // 縦スクロール判定
+    if (Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx)) {
+      isSwiping = false; // 横スワイプキャンセル
+      return;             // 縦スクロールはブラウザに任せる
     }
+    // 横スワイプ判定
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > swipeThreshold) {
+      isSwiping = true;
+    } else {
+      return; // 判定待ち
+    }
+  }
 
-    if (isSwiping) {
-      e.preventDefault(); // 横スワイプ中は横スクロールを止める
-      track.style.transform = `translateX(${currentTranslate + dx * slowFactor}px)`;
-      moved = true;
-    }
-  }, { passive: false });
+  // 横スワイプ中のみ preventDefault
+  if (isSwiping) {
+    e.preventDefault();
+    track.style.transform = `translateX(${currentTranslate + dx * slowFactor}px)`;
+    moved = true;
+  }
+}, { passive: false });
+
 
   container.addEventListener('touchend', e => {
     const dx = e.changedTouches[0].clientX - startX;
