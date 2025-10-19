@@ -67,11 +67,12 @@ body{
 
 .panes-track {
   display: flex;
-  width: auto; /* auto so children size controls layout */
+  width: auto;
   transition: transform .36s cubic-bezier(.2,.9,.2,1);
   will-change: transform;
-  touch-action: none; /* ← 横スワイプも有効にする */
+  touch-action: pan-y; /* 縦スクロールはブラウザに任せる */
 }
+
 
 .tab-pane {
   flex: 0 0 100%;
