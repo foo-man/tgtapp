@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>今日の3つのいいこと 🌿</title>
+
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#86cfa3">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="3つのいいこと">
+  <link rel="apple-touch-icon" href="./kuroba.jpg">
+
+  <style>
+    /* ------------------- 全体 ------------------- */
+    body {
+      font-family: "Hiragino Maru Gothic ProN", "Yu Gothic", sans-serif;
+      background: linear-gradient(180deg, #eef8f3 0%, #ffffff 100%);
+      color: #2f3e34;
+      text-align: center;
+      margin: 0;
+      padding: 1rem;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: -50px;
+      left: -50px;
+      width: 120%;
+      height: 120%;
+      background-image:
+        radial-gradient(rgba(150, 200, 150, 0.08) 20%, transparent 20%),
+        radial-gradient(rgba(130, 180, 130, 0.04) 20%, transparent 20%);
+      background-position: 0 0, 25px 25px;
+      background-size: 50px 50px;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    h1 {
+      color: #356d58;
+      font-size: 1.8rem;
+      margin: 1rem 0;
+    }
+
+    /* ------------------- 入力フォーム ------------------- */
+    .input-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      max-width: 400px;
+      margin: 1rem auto 2rem;
+    }
+
+    .input-card input,
+    .input-card textarea {
+      width: 90%;
+      max-width: 300px;
+      padding: 0.6rem;
+      border: 1px solid #a3c9a8;
+      border-radius: 10px;
+      margin: 0.3rem 0;
+      background: #f9fff9;
+      font-size: 1rem;
+    }
+
+    .input-card textarea {
+      resize: none;
+      height: 60px;
+    }
+
+    /* ------------------- ボタン ------------------- */
+    .btn {
+      background-color: #86cfa3;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 20px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin: 1rem auto;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #6cbf90;
+      transform: translateY(-2px);
+    }
+
+    .btn:focus {
+      outline: 3px solid rgba(102, 187, 141, 0.25);
+      outline-offset: 2px;
+    }
+
+    /* ------------------- カレンダー ------------------- */
+    #calendar {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 1rem;
+      background: #f6fbf7;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 0;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .calendar-header button {
+      background: #a8d5b5;
+      border: none;
+      padding: 0.3rem 0.8rem;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+
+    .calendar-cell {
+      padding: 0.6rem 0;
+      border-radius: 8px;
+      background: #fff;
+      border: 1px solid #d8e8da;
+      cursor: pointer;
+      position: relative;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calendar-cell:focus {
+      box-shadow: 0 0 0 3px rgba(102, 187, 141, 0.18);
+      outline: none;
+    }
+
+    .calendar-cell.empty {
+      background: transparent;
+      border: none;
+      cursor: default;
+    }
+
+    .calendar-cell.has-entry::after {
+      content: "🌸";
+      position: absolute;
+      bottom: 4px;
+      right: 6px;
+      font-size: 1rem;
+    }
+
+    .calendar-weekday-header {
+      font-weight: bold;
+      text-align: center;
+      padding: 6px 0;
+    }
+
+    .calendar-weekday-header.sunday {
+      color: #e74c3c;
+    }
+
+    .calendar-weekday-header.saturday {
+      color: #3498db;
+    }
+
+    /* 保存成功メッセージ */
+    .save-message {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #4caf50;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      z-index: 3000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .save-message.show {
+      opacity: 1;
+    }
+
+    /* ------------------- モーダル ------------------- */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0);
+      justify-content: center;
+      align-items: flex-start;
+      overflow-y: auto;
+      z-index: 1000;
+      transition: background 0.28s ease;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal.show-animate {
+      background: rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-content {
+      background: #fff;
+      border-radius: 16px;
+      margin: 3rem auto;
+      padding: 1rem;
+      max-width: 520px;
+      width: 94%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      transform: translateY(-28px) scale(0.96);
+      transition: opacity 0.36s cubic-bezier(.2, .9, .2, 1), transform 0.36s cubic-bezier(.2, .9, .2, 1);
+      max-height: calc(100vh - 6rem);
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
+    }
+
+    .modal.show-animate .modal-content {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    /* ------------------- 履歴カード ------------------- */
+    .history-card {
+      background: #fff;
+      border: 1px solid #d8e8da;
+      border-radius: 12px;
+      box-shadow: 0 1px 6px rgba(0, 0, 0, 0.08);
+      padding: 1rem;
+      margin: 0.5rem auto;
+      max-width: 500px;
+      text-align: left;
+    }
+
+    .history-card h3 {
+      margin: 0 0 0.4rem;
+      color: #355f4a;
+    }
+
+    .history-card ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .history-card li {
+      background: #f4faf6;
+      margin: 0.2rem 0;
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      word-break: break-word;
+    }
+
+    .comment-box {
+      margin-top: 0.5rem;
+      font-style: italic;
+      color: #4b6653;
+      background: #f9fff9;
+      padding: 0.5rem 0.7rem;
+      border-left: 4px solid #a3cfa3;
+      border-radius: 6px;
+    }
+
+    .history-card button {
+      background: #ff9d9d;
+      color: white;
+      border: none;
+      padding: 0.4rem 0.8rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+      cursor: pointer;
+    }
+
+    .history-card button:hover {
+      background: #f77373;
+    }
+
+    /* ------------------- 日付選択 ------------------- */
+    #entryDateInput {
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    /* ------------------- 桜 ------------------- */
+    .sakura {
+      position: fixed;
+      top: -2rem;
+      pointer-events: none;
+      z-index: 2000;
+      animation: sakuraFall 2.5s linear forwards;
+    }
+
+    @keyframes sakuraFall {
+      0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+      }
+
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* レスポンシブ */
+    @media (max-width:420px) {
+
+      .input-card,
+      .modal-content {
+        padding: 0.8rem;
+      }
+
+      .btn {
+        padding: 0.5rem 1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>今日の3つのいいこと🍀</h1>
+
+  <div class="input-card">
+    <label for="entryDateInput" style="display:block;font-size:0.9rem;margin-bottom:4px;">日付</label>
+    <input type="date" id="entryDateInput" aria-label="日付選択"><br>
+    <input id="good1" placeholder="いいこと①" aria-label="いいこと1"><br>
+    <input id="good2" placeholder="いいこと②" aria-label="いいこと2"><br>
+    <input id="good3" placeholder="いいこと③" aria-label="いいこと3"><br>
+    <textarea id="comment" placeholder="今日のひとことメモ" aria-label="ひとことメモ"></textarea><br>
+    <button class="btn" id="saveBtn">保存</button>
+  </div>
+
+  <div id="calendar" aria-label="カレンダー">
+    <div class="calendar-header">
+      <button id="prevMonthBtn" aria-label="前の月">←</button>
+      <h3 id="calendarTitle" aria-live="polite"></h3>
+      <button id="nextMonthBtn" aria-label="次の月">→</button>
+    </div>
+    <div class="calendar-grid" id="calendarGrid" role="grid"></div>
+  </div>
+
+  <button class="btn" id="showAllBtn">📖 すべての履歴を見る</button>
+
+  <!-- モーダル -->
+  <div id="historyModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalDateTitle"
+    onclick="closeModal(event)">
+    <div class="modal-content" tabindex="-1">
+      <div id="modalNav" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <button id="prevDayBtn" class="btn" style="width:45%;padding:0.5rem;">前日</button>
+        <button id="nextDayBtn" class="btn" style="width:45%;padding:0.5rem;">翌日</button>
+      </div>
+      <h2 id="modalDateTitle">📅</h2>
+      <div id="historyList"></div>
+      <div style="text-align:right;margin-top:8px;"><button id="closeModalBtn" class="btn"
+          style="background:#999">閉じる</button></div>
+    </div>
+  </div>
+
+  <script>
+    /* ---------- 状態 ---------- */
+    let selectedDate = new Date();
+    let modalDate = new Date();
+    let isShowingAllHistory = false;
+    let _lockedScrollY = 0;
+    let _savedBodyPaddingRight = '';
+    let _useIosScrollLock = /iP(ad|hone|od)/.test(navigator.platform) || (navigator.userAgent.includes('Macintosh') && 'ontouchend' in document);
+    let _lastFocusedElement = null;
+
+    /* ---------- ヘルパー ---------- */
+    function formatDate(d) {
+      const y = d.getFullYear();
+      const m = ('0' + (d.getMonth() + 1)).slice(-2);
+      const day = ('0' + d.getDate()).slice(-2);
+      return `${y}-${m}-${day}`;
+    }
+    function formatDateJapanese(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      const y = d.getFullYear();
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+      const w = weekdays[d.getDay()];
+      return `${y}年${m}月${day}日（${w}）`;
+    }
+    function getScrollbarWidth() { return window.innerWidth - document.documentElement.clientWidth; }
+
+    /* ---------- スクロールロック ---------- */
+    function lockBodyScroll() {
+      _lockedScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+      const sbWidth = getScrollbarWidth();
+      if (sbWidth > 0) {
+        _savedBodyPaddingRight = document.body.style.paddingRight || '';
+        const current = parseFloat(getComputedStyle(document.body).paddingRight) || 0;
+        document.body.style.paddingRight = (current + sbWidth) + 'px';
+      }
+      if (_useIosScrollLock) {
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${_lockedScrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+      }
+    }
+    function unlockBodyScroll() {
+      if (_useIosScrollLock) {
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+      } else {
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        window.scrollTo(0, _lockedScrollY);
+      }
+      if (_savedBodyPaddingRight !== '') {
+        document.body.style.paddingRight = _savedBodyPaddingRight;
+      } else {
+        document.body.style.paddingRight = '';
+      }
+      _savedBodyPaddingRight = '';
+    }
+
+    /* ---------- 保存 ---------- */
+    function saveGoodThings() {
+      const key = document.getElementById('entryDateInput').value || formatDate(new Date());
+      const good1 = document.getElementById('good1').value.trim();
+      const good2 = document.getElementById('good2').value.trim();
+      const good3 = document.getElementById('good3').value.trim();
+      const comment = document.getElementById('comment').value.trim();
+
+      // 少なくとも1つ入力がない場合は保存しない
+      if (!good1 && !good2 && !good3 && !comment) {
+        alert('少なくとも1つ入力してください。');
+        return;
+      }
+
+      const data = {
+        goodThings: [good1, good2, good3],
+        comment: comment
+      };
+      try {
+        localStorage.setItem(key, JSON.stringify(data));
+      } catch (err) {
+        console.error('localStorage set failed', err);
+        alert('保存に失敗しました（ストレージがいっぱいか、プライベートモードの可能性があります）。');
+        return;
+      }
+
+      renderCalendar();
+      document.getElementById('good1').value = '';
+      document.getElementById('good2').value = '';
+      document.getElementById('good3').value = '';
+      document.getElementById('comment').value = '';
+      showSaveMessage();
+      createSakura();
+    }
+
+    /* ---------- カレンダー ---------- */
+    function renderCalendar() {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+      const year = selectedDate.getFullYear();
+      const month = selectedDate.getMonth();
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      document.getElementById('calendarTitle').textContent = `${year}年 ${month + 1}月`;
+
+      const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+      weekdays.forEach((d, i) => {
+        const c = document.createElement('div');
+        c.textContent = d;
+        c.className = 'calendar-weekday-header';
+        c.setAttribute('role', 'columnheader');
+        if (i === 0) c.classList.add('sunday');
+        if (i === 6) c.classList.add('saturday');
+        grid.appendChild(c);
+      });
+
+      // 空セル（前月のはみ出し分）
+      for (let i = 0; i < firstDay.getDay(); i++) {
+        const empty = document.createElement('div');
+        empty.className = 'calendar-cell empty';
+        empty.setAttribute('aria-hidden', 'true');
+        grid.appendChild(empty);
+      }
+      for (let d = 1; d <= lastDay.getDate(); d++) {
+        const date = new Date(year, month, d);
+        const key = formatDate(date);
+        const cell = document.createElement('div');
+        cell.className = 'calendar-cell';
+        if (localStorage.getItem(key)) cell.classList.add('has-entry');
+        cell.textContent = d;
+        cell.setAttribute('role', 'button');
+        cell.tabIndex = 0;
+        cell.setAttribute('aria-label', `${year}年 ${month + 1}月 ${d}日 の履歴を開く`);
+        cell.addEventListener('click', () => showHistoryModal(date));
+        cell.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHistoryModal(date); } });
+        grid.appendChild(cell);
+      }
+    }
+
+    /* ---------- モーダル表示 ---------- */
+    function showHistoryModal(date) {
+      modalDate = new Date(date);
+      isShowingAllHistory = false;
+      const modal = document.getElementById('historyModal');
+      const list = document.getElementById('historyList');
+      const title = document.getElementById('modalDateTitle');
+      const key = formatDate(modalDate);
+
+      title.textContent = `📅 ${formatDateJapanese(key)}`;
+      list.innerHTML = '';
+      document.getElementById('modalNav').style.display = 'flex';
+
+      const raw = localStorage.getItem(key);
+      if (raw) {
+        try {
+          const data = JSON.parse(raw);
+          if (data && data.goodThings) {
+            const card = buildHistoryCard(key, data);
+            list.appendChild(card);
+          } else {
+            list.innerHTML = '<p>まだ履歴がありません</p>';
+          }
+        } catch (err) {
+          console.warn('showHistoryModal: skip invalid JSON for key', key, err);
+          list.innerHTML = '<p>まだ履歴がありません</p>';
+        }
+      } else {
+        list.innerHTML = '<p>まだ履歴がありません</p>';
+      }
+
+      // フォーカス管理
+      _lastFocusedElement = document.activeElement;
+      lockBodyScroll();
+      modal.classList.add('show');
+      requestAnimationFrame(() => {
+        void modal.offsetWidth;
+        modal.classList.add('show-animate');
+        const content = modal.querySelector('.modal-content');
+        if (content) {
+          content.focus();
+          content.scrollTop = 0;
+        }
+        trapFocus(modal);
+      });
+    }
+
+    function closeModal(e) {
+      if (!e.target.classList.contains('modal')) return;
+      const modal = e.target;
+      modal.classList.remove('show-animate');
+      setTimeout(() => {
+        modal.classList.remove('show');
+        unlockBodyScroll();
+        if (_lastFocusedElement) _lastFocusedElement.focus();
+      }, 360);
+    }
+
+    function prevDay() { modalDate.setDate(modalDate.getDate() - 1); showHistoryModal(modalDate); }
+    function nextDay() { modalDate.setDate(modalDate.getDate() + 1); showHistoryModal(modalDate); }
+    document.getElementById('prevDayBtn').onclick = prevDay;
+    document.getElementById('nextDayBtn').onclick = nextDay;
+
+    /* モーダル内の閉じるボタン */
+    document.getElementById('closeModalBtn').addEventListener('click', () => {
+      const modal = document.getElementById('historyModal');
+      modal.classList.remove('show-animate');
+      setTimeout(() => { modal.classList.remove('show'); unlockBodyScroll(); if (_lastFocusedElement) _lastFocusedElement.focus(); }, 360);
+    });
+
+    /* ---------- 全履歴 ---------- */
+    function showAllHistory() {
+      isShowingAllHistory = true;
+      const modal = document.getElementById('historyModal');
+      const list = document.getElementById('historyList');
+      const title = document.getElementById('modalDateTitle');
+      list.innerHTML = '';
+      title.textContent = '📖 すべての履歴';
+      document.getElementById('modalNav').style.display = 'none';
+
+      const keys = Object.keys(localStorage).filter(k => /^\d{4}-\d{2}-\d{2}$/.test(k)).sort().reverse();
+
+      if (keys.length === 0) {
+        list.innerHTML = '<p>まだ履歴がありません</p>';
+      } else {
+        keys.forEach(k => {
+          const raw = localStorage.getItem(k);
+          if (!raw) return;
+          try {
+            const d = JSON.parse(raw);
+            if (!d || !d.goodThings) return;
+            const card = buildHistoryCard(k, d);
+            list.appendChild(card);
+          } catch (err) {
+            console.warn('showAllHistory: skip invalid JSON for key', k, err);
+          }
+        });
+      }
+
+      _lastFocusedElement = document.activeElement;
+      lockBodyScroll();
+      modal.classList.add('show');
+      requestAnimationFrame(() => { void modal.offsetWidth; modal.classList.add('show-animate'); });
+      const content = modal.querySelector('.modal-content');
+      if (content) content.focus();
+      trapFocus(modal);
+    }
+
+    /* ---------- 削除 ---------- */
+    function deleteEntry(key) {
+      if (!confirm('この記録を削除してもよろしいですか?')) return;
+      localStorage.removeItem(key);
+      renderCalendar();
+      if (isShowingAllHistory) showAllHistory();
+      else showHistoryModal(modalDate);
+    }
+
+    /* ---------- 履歴カード作成（安全） ---------- */
+    function buildHistoryCard(key, data) {
+      const card = document.createElement('div');
+      card.className = 'history-card';
+
+      const h3 = document.createElement('h3');
+      h3.textContent = key;
+      card.appendChild(h3);
+
+      const ul = document.createElement('ul');
+      const li1 = document.createElement('li'); li1.textContent = `① ${data.goodThings[0] || ''}`; ul.appendChild(li1);
+      const li2 = document.createElement('li'); li2.textContent = `② ${data.goodThings[1] || ''}`; ul.appendChild(li2);
+      const li3 = document.createElement('li'); li3.textContent = `③ ${data.goodThings[2] || ''}`; ul.appendChild(li3);
+      card.appendChild(ul);
+
+      if (data.comment) {
+        const cm = document.createElement('div');
+        cm.className = 'comment-box';
+        cm.textContent = data.comment;
+        card.appendChild(cm);
+      }
+
+      const del = document.createElement('button');
+      del.textContent = '削除';
+      del.onclick = () => deleteEntry(key);
+      card.appendChild(del);
+
+      return card;
+    }
+
+    /* ---------- 保存成功メッセージ ---------- */
+    function showSaveMessage() {
+      const msg = document.createElement('div');
+      msg.className = 'save-message';
+      msg.textContent = '✓ 保存しました！';
+      msg.setAttribute('role', 'status');
+      msg.setAttribute('aria-live', 'polite');
+      document.body.appendChild(msg);
+      setTimeout(() => msg.classList.add('show'), 10);
+      setTimeout(() => msg.classList.remove('show'), 2500);
+      setTimeout(() => msg.remove(), 2900);
+    }
+
+    /* ---------- フォーカストラップ ---------- */
+    function trapFocus(modal) {
+      const focusableElements = modal.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      );
+      const firstFocusable = focusableElements[0];
+      const lastFocusable = focusableElements[focusableElements.length - 1];
+
+      const handleTab = (e) => {
+        if (e.key !== 'Tab') return;
+        if (e.shiftKey) {
+          if (document.activeElement === firstFocusable) {
+            lastFocusable.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastFocusable) {
+            firstFocusable.focus();
+            e.preventDefault();
+          }
+        }
+      };
+
+      modal.addEventListener('keydown', handleTab);
+    }
+
+    /* ---------- 桜 ---------- */
+    function createSakura() {
+      for (let i = 0; i < 12; i++) {
+        const s = document.createElement('div');
+        s.className = 'sakura';
+        s.textContent = '🌸';
+        s.style.left = (Math.random() * 88 + 6) + '%';
+        s.style.fontSize = (14 + Math.random() * 28) + 'px';
+        s.style.animationDuration = (2 + Math.random() * 1.2) + 's';
+        document.body.appendChild(s);
+        setTimeout(() => s.remove(), 3200);
+      }
+    }
+
+    /* ---------- Service Worker 登録 ---------- */
+    const APP_VERSION = '1.0.1';
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        const swUrl = './sw.js?v=' + APP_VERSION;
+        navigator.serviceWorker.register(swUrl)
+          .then(reg => console.log('SW registered', reg))
+          .catch(err => console.warn('SW registration failed', err));
+      });
+    }
+
+    /* ---------- 初期化 ---------- */
+    window.onload = () => {
+      document.getElementById('entryDateInput').value = formatDate(new Date());
+      renderCalendar();
+
+      document.getElementById('saveBtn').addEventListener('click', saveGoodThings);
+      document.getElementById('prevMonthBtn').addEventListener('click', () => { selectedDate.setMonth(selectedDate.getMonth() - 1); renderCalendar(); });
+      document.getElementById('nextMonthBtn').addEventListener('click', () => { selectedDate.setMonth(selectedDate.getMonth() + 1); renderCalendar(); });
+      document.getElementById('showAllBtn').addEventListener('click', showAllHistory);
+
+      // Esc でモーダル閉じる
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          const modal = document.getElementById('historyModal');
+          if (modal.classList.contains('show')) {
+            modal.classList.remove('show-animate');
+            setTimeout(() => { modal.classList.remove('show'); unlockBodyScroll(); if (_lastFocusedElement) _lastFocusedElement.focus(); }, 360);
+          }
+        }
+      });
+
+      // フォーカススタイル向上のため、クリックでフォーカスも付与
+      document.addEventListener('click', (e) => {
+        if (e.target.classList && e.target.classList.contains('calendar-cell')) {
+          e.target.focus();
+        }
+      });
+    };
+  </script>
+</body>
+
+</html>
